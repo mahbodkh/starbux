@@ -2,8 +2,9 @@ package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.CartEntity;
 import app.bestseller.starbux.domain.CartProductDetailEntity;
-import app.bestseller.starbux.domain.DiscountEntity;
 import app.bestseller.starbux.domain.ProductEntity;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.util.ObjectUtils;
 import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -78,5 +80,32 @@ public class DiscountService {
             .min(Comparator.comparing(CartProductDetailEntity::getPrice))
             .orElseThrow(NoSuchElementException::new)
             .getPrice();
+    }
+
+    @NoArgsConstructor
+    @Data
+    public static class DiscountEntity {
+
+        private Type type;
+        private Integer quantity;
+        private BigDecimal price;
+
+        public enum Type {
+            PERCENTAGE,
+            PRICE
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            var that = (DiscountEntity) o;
+            return type == that.type && Objects.equals(quantity, that.quantity) && Objects.equals(price, that.price);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, quantity, price);
+        }
     }
 }

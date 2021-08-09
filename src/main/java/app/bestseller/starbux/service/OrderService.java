@@ -1,6 +1,5 @@
 package app.bestseller.starbux.service;
 
-import app.bestseller.starbux.domain.DiscountEntity;
 import app.bestseller.starbux.domain.OrderEntity;
 import app.bestseller.starbux.domain.UserEntity;
 import app.bestseller.starbux.exception.NotFoundException;
@@ -35,7 +34,7 @@ public class OrderService {
         var discount = Optional.of(discountService.applyRules(cartEntity))
             .filter(Optional::isPresent)
             .map(Optional::get)
-            .orElse(new DiscountEntity());
+            .orElse(new DiscountService.DiscountEntity());
 
         orderEntity.ifPresent(entity -> changeStatusOrder(entity.getId(), OrderEntity.Status.CANCEL));
 
@@ -70,7 +69,7 @@ public class OrderService {
     }
 
     @Transactional(readOnly = true)
-    private Optional<OrderEntity> getOrderByUser(Long user) {
+    public Optional<OrderEntity> getOrderByUser(Long user) {
         return orderRepository.findByUserAndStatus(user, OrderEntity.Status.OPEN);
     }
 

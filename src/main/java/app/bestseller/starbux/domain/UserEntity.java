@@ -57,7 +57,7 @@ public class UserEntity {
     @Column(name = "email", length = 254, unique = true)
     private String email;
     @ElementCollection(fetch = FetchType.EAGER, targetClass = Authority.class)
-    @CollectionTable(name = "authorities", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "best_authorities", joinColumns = @JoinColumn(name = "user_id"))
     @Column(name = "authority", nullable = false)
     @Enumerated(EnumType.STRING)
     private Set<Authority> authorities = Collections.emptySet();
