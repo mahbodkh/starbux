@@ -72,6 +72,5 @@ public class ProductService {
             );
     }
 
-    private final ProductService productService;
     private final ProductRepository productRepository;
 }

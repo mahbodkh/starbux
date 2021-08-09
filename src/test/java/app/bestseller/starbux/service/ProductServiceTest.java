@@ -53,19 +53,12 @@ public class ProductServiceTest {
 
     }
 
-    private CategoryEntity buildCategoryEntity() {
-        var category = new CategoryEntity();
-        category.setName("category_name");
-        category.setDescription("category_description");
-        category.setLevel(0);
-        return category;
-    }
+
 
     private ProductEntity buildProductEntity() {
         var product = new ProductEntity();
         product.setName("product_name");
         product.setDescription("product_description");
-        product.setCategory(buildCategoryEntity().getId());
         product.setStatus(ProductEntity.Status.AVAILABLE);
         return product;
     }

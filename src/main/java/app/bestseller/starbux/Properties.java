@@ -9,8 +9,4 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 public class Properties {
-    private Integer maxPoolSize;
-    private Integer corePoolSize;
-    private Integer queueCapacity;
-    private String threadNamePrefix;
 }
