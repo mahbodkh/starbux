@@ -54,8 +54,42 @@
 		</dependency>
 	</dependencies>
 
+	<profiles>
+		<profile>
+			<id>h2</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>com.h2database</groupId>
+					<artifactId>h2</artifactId>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+
+
+	</profiles>
+
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>${flyway.version}</version>
+				<configuration>
+					<url>jdbc:h2:file:./db/starbux;</url>
+					<user>sa</user>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.h2database</groupId>
+						<artifactId>h2</artifactId>
+						<version>${h2.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
