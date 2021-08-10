@@ -5,8 +5,7 @@ create table "best_account"
     changed   timestamp,
     comment   varchar(200),
     created   timestamp,
-    credit
-              decimal(36, 18) not null,
+    credit    decimal(36, 18) not null,
     status    varchar(255)    not null,
     "user"    bigint          not null,
     primary key (id)
