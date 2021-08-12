@@ -57,8 +57,8 @@ public class UserController {
                     reply.getEmail(),
                     reply.getCreated(),
                     reply.getChanged(),
-                    reply.getAuthorities(),
-                    reply.getStatus())
+                    reply.getStatus().name(),
+                    reply.getAuthorities())
             ));
     }
 
@@ -89,8 +89,8 @@ public class UserController {
                 user.getEmail(),
                 user.getCreated(),
                 user.getChanged(),
-                user.getAuthorities(),
-                user.getStatus()
+                user.getStatus().name(),
+                user.getAuthorities()
             ));
         return ResponseEntity.ok(reply);
     }
@@ -104,6 +104,7 @@ public class UserController {
             request.getEmail(),
             request.getName(),
             request.getFamily(),
+            request.getStatus(),
             request.getAuthorities(),
             Boolean.TRUE
         );
@@ -167,18 +168,18 @@ public class UserController {
         private String email;
         private Date created;
         private Date changed;
+        private String status;
         private Set<UserEntity.Authority> authorities;
-        private UserEntity.Status status;
     }
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @Getter
     public static class CreateRequest {
         private String username;
-        private String password;
         private String name;
         private String family;
         private String email;
+        private String status;
         private Set<UserEntity.Authority> authorities;
     }
 }
