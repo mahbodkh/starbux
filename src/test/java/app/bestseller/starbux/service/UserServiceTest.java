@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -116,15 +115,17 @@ public class UserServiceTest {
         edit.setName("name_edited");
         edit.setFamily("family_edited");
         edit.setEmail("email_edited@test.com");
+        edit.setStatus(UserEntity.Status.ACTIVE);
         edit.setAuthorities(Set.of(UserEntity.Authority.ADMIN));
         var editSave =
-            userService.editUser(save.getId(), edit.getUsername(), edit.getEmail(), edit.getName(), edit.getFamily(), edit.getAuthorities(), true).get();
+            userService.editUser(save.getId(), edit.getUsername(), edit.getEmail(), edit.getName(), edit.getFamily(), edit.getStatus(), edit.getAuthorities(), true).get();
 
         assertEquals(save.getId(), editSave.getId());
         assertEquals(edit.getUsername(), editSave.getUsername());
         assertEquals(edit.getName(), editSave.getName());
         assertEquals(edit.getFamily(), editSave.getFamily());
         assertEquals(edit.getEmail(), editSave.getEmail());
+        assertEquals(edit.getStatus(), editSave.getStatus());
         assertEquals(edit.getAuthorities(), editSave.getAuthorities());
     }
 
@@ -173,7 +174,7 @@ public class UserServiceTest {
         userService.deleteUser(user.getId());
 
         var userExist = userRepository.existsById(user.getId());
-        assertEquals(userExist, Boolean.FALSE);
+        assertFalse(userExist);
     }
 
 

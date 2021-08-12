@@ -1,23 +1,21 @@
 package app.bestseller.starbux.domain;
 
 
+import app.bestseller.starbux.domain.util.SetAuthorityConverter;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import javax.persistence.CollectionTable;
 import javax.persistence.Column;
-import javax.persistence.ElementCollection;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
@@ -56,10 +54,8 @@ public class UserEntity {
     @Size(min = 5, max = 254)
     @Column(name = "email", length = 254, unique = true)
     private String email;
-    @ElementCollection(fetch = FetchType.EAGER, targetClass = Authority.class)
-    @CollectionTable(name = "\"best_authorities\"", joinColumns = @JoinColumn(name = "user_id"))
-    @Column(name = "authority", nullable = false)
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = SetAuthorityConverter.class)
+    @Column(name = "authorities")
     private Set<Authority> authorities = Collections.emptySet();
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

@@ -67,26 +67,28 @@ public class UserService {
         @CacheEvict(key = "'userByEmail/' + #email")
     })
     @Transactional
-    public Optional<UserEntity> editUser(Long user, String username, String email, String name, String family, String status ,Set<UserEntity.Authority> authorities,
-                                         Boolean isAdmin) {
+    public Optional<UserEntity> editUser(Long user, String username, String email, String name, String family, UserEntity.Status status,
+                                         Set<UserEntity.Authority> authorities, Boolean isAdmin) {
         return Optional.of(userRepository.findById(user))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(reply -> {
-                if (!username.isEmpty() && !username.isBlank())
+                if (username != null && !username.isEmpty() && !username.isBlank())
                     reply.setUsername(username);
-                if (!email.isEmpty() && !email.isBlank())
+                if (email != null && !email.isEmpty() && !email.isBlank())
                     reply.setEmail(email.toLowerCase());
-                if (!name.isEmpty() && !name.isBlank())
+                if (name != null && !name.isEmpty() && !name.isBlank())
                     reply.setName(name);
-                if (!family.isEmpty() && !family.isBlank())
+                if (family != null && !family.isEmpty() && !family.isBlank())
                     reply.setFamily(family);
-                if (!status.isEmpty() && !status.isBlank())
-                    reply.setStatus(UserEntity.Status.valueOf(status));
-                if (isAdmin && !authorities.isEmpty())
-                    reply.setAuthorities(authorities);
+                if (status != null && isAdmin)
+                    reply.setStatus(status);
+                if (authorities != null && !authorities.isEmpty() && isAdmin)
+                    authorities.stream()
+                        .filter(auth -> !reply.getAuthorities().contains(auth))
+                        .forEach(reply.getAuthorities()::add);
                 var save = userRepository.save(reply);
-                log.debug("The user has updated: {}", save);
+                log.debug("The user has edited: {}", save);
                 return save;
             });
     }

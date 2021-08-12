@@ -31,7 +31,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by Ebrahim Kh.
@@ -58,7 +60,7 @@ public class UserController {
                     reply.getCreated(),
                     reply.getChanged(),
                     reply.getStatus().name(),
-                    reply.getAuthorities())
+                    reply.getAuthorities().stream().map(Enum::name).collect(Collectors.toSet()))
             ));
     }
 
@@ -69,7 +71,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.OK)
     public void createUserByAdmin(@Valid @RequestBody CreateRequest request) throws BadRequestException {
         userService.createUser(request.getUsername(),
-            request.getAuthorities(),
+            request.getAuthorities().stream().map(UserEntity.Authority::valueOf).collect(Collectors.toSet()),
             request.getEmail(),
             request.getName(),
             request.getFamily(),
@@ -90,7 +92,7 @@ public class UserController {
                 user.getCreated(),
                 user.getChanged(),
                 user.getStatus().name(),
-                user.getAuthorities()
+                user.getAuthorities().stream().map(Enum::name).collect(Collectors.toSet())
             ));
         return ResponseEntity.ok(reply);
     }
@@ -104,8 +106,8 @@ public class UserController {
             request.getEmail(),
             request.getName(),
             request.getFamily(),
-            request.getStatus(),
-            request.getAuthorities(),
+            UserEntity.Status.valueOf(request.getStatus()),
+            request.getAuthorities().stream().map(UserEntity.Authority::valueOf).collect(Collectors.toSet()),
             Boolean.TRUE
         );
     }
@@ -169,7 +171,7 @@ public class UserController {
         private Date created;
         private Date changed;
         private String status;
-        private Set<UserEntity.Authority> authorities;
+        private Set<String> authorities;
     }
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
@@ -180,6 +182,6 @@ public class UserController {
         private String family;
         private String email;
         private String status;
-        private Set<UserEntity.Authority> authorities;
+        private Set<String> authorities;
     }
 }
