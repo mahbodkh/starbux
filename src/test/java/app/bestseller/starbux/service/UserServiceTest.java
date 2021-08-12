@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -108,22 +109,23 @@ public class UserServiceTest {
     @Transactional
     public void testEditUser() throws Exception {
         var user = buildUserEntity();
-        userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
 
         var edit = new UserEntity();
         edit.setUsername("username_edited");
         edit.setName("name_edited");
         edit.setFamily("family_edited");
-        edit.setEmail("email_edited");
+        edit.setEmail("email_edited@test.com");
         edit.setAuthorities(Set.of(UserEntity.Authority.ADMIN));
-        userService.editUser(user.getId(), edit.getUsername(), edit.getEmail(), edit.getName(), edit.getFamily(), edit.getAuthorities(), false);
+        var editSave =
+            userService.editUser(save.getId(), edit.getUsername(), edit.getEmail(), edit.getName(), edit.getFamily(), edit.getAuthorities(), true).get();
 
-        UserEntity userEntity = userService.loadUser(user.getId()).get();
-        assertEquals(user.getId(), userEntity.getId());
-        assertEquals(edit.getName(), userEntity.getName());
-        assertEquals(edit.getFamily(), userEntity.getFamily());
-        assertEquals(edit.getEmail(), userEntity.getEmail());
-        assertEquals(edit.getAuthorities(), userEntity.getAuthorities());
+        assertEquals(save.getId(), editSave.getId());
+        assertEquals(edit.getUsername(), editSave.getUsername());
+        assertEquals(edit.getName(), editSave.getName());
+        assertEquals(edit.getFamily(), editSave.getFamily());
+        assertEquals(edit.getEmail(), editSave.getEmail());
+        assertEquals(edit.getAuthorities(), editSave.getAuthorities());
     }
 
     @Test

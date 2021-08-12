@@ -67,20 +67,22 @@ public class UserService {
         @CacheEvict(key = "'userByEmail/' + #email")
     })
     @Transactional
-    public Optional<UserEntity> editUser(Long user, String username, String email, String name, String family, Set<UserEntity.Authority> authorities,
+    public Optional<UserEntity> editUser(Long user, String username, String email, String name, String family, String status ,Set<UserEntity.Authority> authorities,
                                          Boolean isAdmin) {
         return Optional.of(userRepository.findById(user))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .map(reply -> {
-                if (!email.isEmpty() && !email.isBlank())
-                    reply.setEmail(email.toLowerCase());
-                if (!family.isEmpty() && !family.isBlank())
-                    reply.setFamily(family);
-                if (!name.isEmpty() && !name.isBlank())
-                    reply.setName(name);
                 if (!username.isEmpty() && !username.isBlank())
                     reply.setUsername(username);
+                if (!email.isEmpty() && !email.isBlank())
+                    reply.setEmail(email.toLowerCase());
+                if (!name.isEmpty() && !name.isBlank())
+                    reply.setName(name);
+                if (!family.isEmpty() && !family.isBlank())
+                    reply.setFamily(family);
+                if (!status.isEmpty() && !status.isBlank())
+                    reply.setStatus(UserEntity.Status.valueOf(status));
                 if (isAdmin && !authorities.isEmpty())
                     reply.setAuthorities(authorities);
                 var save = userRepository.save(reply);
