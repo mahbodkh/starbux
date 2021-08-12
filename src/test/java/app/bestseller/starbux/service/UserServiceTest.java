@@ -88,24 +88,6 @@ public class UserServiceTest {
 
     @Test
     @Transactional
-    public void testLoadUserAdmin() throws Exception {
-        var user = buildUserEntity();
-        user.setAuthorities(Set.of(UserEntity.Authority.ADMIN));
-        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), true);
-
-        var userAdmins = userService.loadUsersAdmin();
-        assertEquals(1, userAdmins.size());
-        assertEquals(user.getUsername(), save.getUsername());
-        assertEquals(user.getName(), save.getName());
-        assertEquals(user.getFamily(), save.getFamily());
-        assertEquals(user.getEmail(), save.getEmail());
-        assertFalse(user.getAuthorities().isEmpty());
-        assertEquals(1, user.getAuthorities().size());
-        assertTrue(user.getAuthorities().contains(UserEntity.Authority.ADMIN));
-    }
-
-    @Test
-    @Transactional
     public void testEditUser() throws Exception {
         var user = buildUserEntity();
         var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
@@ -133,24 +115,24 @@ public class UserServiceTest {
     @Transactional
     public void testFrozenUser() throws Exception {
         var user = buildUserEntity();
-        userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
 
-        userService.frozenUser(user.getId());
+        userService.frozenUser(save.getId());
 
-        UserEntity userEntity = userService.loadUser(user.getId()).get();
-        assertEquals(userEntity.getStatus(), UserEntity.Status.FROZEN);
+        var userFrozen = userService.loadUser(save.getId()).get();
+        assertEquals(userFrozen.getStatus(), UserEntity.Status.FROZEN);
     }
 
     @Test
     @Transactional
     public void testBanUser() throws Exception {
         var user = buildUserEntity();
-        userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
 
-        userService.banUser(user.getId());
+        userService.banUser(save.getId());
 
-        UserEntity userEntity = userService.loadUser(user.getId()).get();
-        assertEquals(userEntity.getStatus(), UserEntity.Status.BANNED);
+        var userBan = userService.loadUser(save.getId()).get();
+        assertEquals(userBan.getStatus(), UserEntity.Status.BANNED);
     }
 
     @Test
@@ -161,20 +143,20 @@ public class UserServiceTest {
 
         userService.safeDeleteUser(save.getId());
 
-        UserEntity userEntity = userRepository.getById(save.getId());
-        assertEquals(userEntity.getStatus(), UserEntity.Status.DELETED);
+        var userDelete = userRepository.getById(save.getId());
+        assertEquals(userDelete.getStatus(), UserEntity.Status.DELETED);
     }
 
     @Test
     @Transactional
     public void testDeleteUser() throws Exception {
         var user = buildUserEntity();
-        userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
 
-        userService.deleteUser(user.getId());
+        userService.deleteUser(save.getId());
 
-        var userExist = userRepository.existsById(user.getId());
-        assertFalse(userExist);
+        var userDeleted = userRepository.existsById(save.getId());
+        assertFalse(userDeleted);
     }
 
 

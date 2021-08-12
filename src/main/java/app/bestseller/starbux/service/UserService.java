@@ -84,9 +84,7 @@ public class UserService {
                 if (status != null && isAdmin)
                     reply.setStatus(status);
                 if (authorities != null && !authorities.isEmpty() && isAdmin)
-                    authorities.stream()
-                        .filter(auth -> !reply.getAuthorities().contains(auth))
-                        .forEach(reply.getAuthorities()::add);
+                    reply.setAuthorities(authorities);
                 var save = userRepository.save(reply);
                 log.debug("The user has edited: {}", save);
                 return save;
@@ -107,11 +105,6 @@ public class UserService {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .orElseThrow(() -> new NotFoundException("Username (" + username + ") not found."));
-    }
-
-    @Transactional(readOnly = true)
-    public List<UserEntity> loadUsersAdmin() {
-        return userRepository.findAllByAuthoritiesIn(Set.of(UserEntity.Authority.ADMIN));
     }
 
     private Optional<UserEntity> getOptionalUserEntity(Long user) {

@@ -17,5 +17,4 @@ import java.util.Set;
 public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByUsername(String username);
     Optional<UserEntity> findOneByEmailIgnoreCase(String email);
-    List<UserEntity> findAllByAuthoritiesIn(Set<UserEntity.Authority> authority);
 }
