@@ -11,11 +11,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.List;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Created by Ebrahim Kh.
@@ -93,18 +91,17 @@ public class UserServiceTest {
     public void testLoadUserAdmin() throws Exception {
         var user = buildUserEntity();
         user.setAuthorities(Set.of(UserEntity.Authority.ADMIN));
-        userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), true);
 
-        List<UserEntity> userAdmins = userService.loadUsersAdmin();
-        assertEquals(userAdmins.size(), 1);
-        assertEquals(user.getUsername(), "username");
-        assertEquals(user.getName(), "first_name");
-        assertEquals(user.getFamily(), "last_family");
-        assertEquals(user.getEmail(), "email@email.com");
-        Set<UserEntity.Authority> authorities = user.getAuthorities();
-        assertEquals(authorities.isEmpty(), Boolean.FALSE);
-        assertEquals(authorities.size(), 1);
-        assertEquals(authorities.contains(UserEntity.Authority.ADMIN), Boolean.TRUE);
+        var userAdmins = userService.loadUsersAdmin();
+        assertEquals(1, userAdmins.size());
+        assertEquals(user.getUsername(), save.getUsername());
+        assertEquals(user.getName(), save.getName());
+        assertEquals(user.getFamily(), save.getFamily());
+        assertEquals(user.getEmail(), save.getEmail());
+        assertFalse(user.getAuthorities().isEmpty());
+        assertEquals(1, user.getAuthorities().size());
+        assertTrue(user.getAuthorities().contains(UserEntity.Authority.ADMIN));
     }
 
     @Test

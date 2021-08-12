@@ -51,9 +51,10 @@ public class UserService {
         if (isAdmin) {
             user.status(UserEntity.Status.ACTIVE);
             user.authorities(authorities);
+        } else {
+            user.status(UserEntity.Status.PENDING);
+            user.authorities(Set.of(UserEntity.Authority.USER));
         }
-        user.status(UserEntity.Status.PENDING);
-        user.authorities(Set.of(UserEntity.Authority.USER));
         var save = userRepository.save(user.build());
         log.debug("The user has saved: {}", save);
         return save;
