@@ -33,17 +33,17 @@ public class UserServiceTest {
     @Transactional
     public void testInsertUser() throws Exception {
         var user = buildUserEntity();
-        var userPersisted =
+        var save =
             userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
 
-        var userExist = userRepository.existsById(userPersisted.getId());
+        var userExist = userRepository.existsById(save.getId());
         assertTrue(userExist);
-        assertEquals(UserEntity.Status.PENDING, userPersisted.getStatus());
-        assertEquals(user.getUsername(), userPersisted.getUsername());
-        assertEquals(user.getEmail(), userPersisted.getEmail());
-        assertEquals(user.getName(), userPersisted.getName());
-        assertEquals(user.getFamily(), userPersisted.getFamily());
-        assertTrue(userPersisted.getAuthorities().contains(UserEntity.Authority.USER));
+        assertEquals(UserEntity.Status.PENDING, save.getStatus());
+        assertEquals(user.getUsername(), save.getUsername());
+        assertEquals(user.getEmail(), save.getEmail());
+        assertEquals(user.getName(), save.getName());
+        assertEquals(user.getFamily(), save.getFamily());
+        assertTrue(save.getAuthorities().contains(UserEntity.Authority.USER));
     }
 
 
