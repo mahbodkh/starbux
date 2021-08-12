@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 /**
@@ -54,12 +55,13 @@ public class ProductServiceTest {
     }
 
 
-
     private ProductEntity buildProductEntity() {
         var product = new ProductEntity();
         product.setName("product_name");
         product.setDescription("product_description");
         product.setStatus(ProductEntity.Status.AVAILABLE);
+        product.setPrice(BigDecimal.valueOf(4));
+        product.setType(ProductEntity.Type.MAIN);
         return product;
     }
 
@@ -73,4 +75,6 @@ public class ProductServiceTest {
         user.setEmail("email@email.com");
         return user;
     }
+
+    private ProductEntity product;
 }

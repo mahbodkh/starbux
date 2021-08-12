@@ -75,6 +75,18 @@ public class UserServiceTest {
 
     @Test
     @Transactional
+    public void testLoadUserByUsername() throws Exception {
+        var user = buildUserEntity();
+        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+
+        var userByUsername = userService.loadByUsername(user.getUsername());
+
+        assertEquals(save.getId(), userByUsername.getId());
+        assertEquals(save.getUsername(),userByUsername.getUsername());
+    }
+
+    @Test
+    @Transactional
     public void testLoadUsers() throws Exception {
         var user = buildUserEntity();
         userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
