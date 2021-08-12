@@ -5,13 +5,13 @@ import app.bestseller.starbux.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Created by Ebrahim Kh.
@@ -71,13 +71,35 @@ public class ProductServiceTest {
     @Test
     @Transactional
     public void testEditProduct() throws Exception {
+        var product = buildProductEntity();
+        var save = productService.createProduct(product.getName(), product.getDescription(), product.getPrice(), product.getStatus(), product.getType());
 
+        var edit = new ProductEntity();
+        edit.setStatus(ProductEntity.Status.DISCONTINUE);
+        edit.setName("product_edit_name");
+        edit.setDescription("product_edit_description");
+        edit.setPrice(BigDecimal.valueOf(10));
+        edit.setType(ProductEntity.Type.SIDE);
+        var editSave = productService.editProduct(save.getId(), edit.getName(), edit.getDescription(), edit.getPrice(), edit.getStatus(), edit.getType()).get();
+
+        assertEquals(save.getId(), editSave.getId());
+        assertEquals(edit.getName(), editSave.getName());
+        assertEquals(edit.getDescription(), editSave.getDescription());
+        assertEquals(edit.getStatus(), editSave.getStatus());
+        assertEquals(edit.getType(), editSave.getType());
+        assertEquals(edit.getPrice(), editSave.getPrice());
     }
 
     @Test
     @Transactional
     public void testDeleteProduct() throws Exception {
+        var product = buildProductEntity();
+        var save = productService.createProduct(product.getName(), product.getDescription(), product.getPrice(), product.getStatus(), product.getType());
 
+        productService.deleteProduct(save.getId());
+
+        var productDeleted = productRepository.existsById(save.getId());
+        assertFalse(productDeleted);
     }
 
 

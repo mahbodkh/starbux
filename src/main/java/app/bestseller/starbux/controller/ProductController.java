@@ -87,8 +87,8 @@ public class ProductController {
 
     @PutMapping("/admin/{id}/edit/")
     @ResponseStatus(HttpStatus.OK)
-    public void editCurrency(@PathVariable("id") Long product, @Valid @RequestBody ProductRequest request) {
-        productService.updateProduct(product,
+    public void editProduct(@PathVariable("id") Long product, @Valid @RequestBody ProductRequest request) {
+        productService.editProduct(product,
             request.getName(),
             request.getDescription(),
             BigDecimal.valueOf(request.getPrice()),

@@ -86,7 +86,7 @@ public class UserService {
                 if (authorities != null && !authorities.isEmpty() && isAdmin)
                     reply.setAuthorities(authorities);
                 var save = userRepository.save(reply);
-                log.debug("The user has edited: {}", save);
+                log.debug("The user has been edited: {}", save);
                 return save;
             });
     }

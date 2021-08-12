@@ -58,7 +58,25 @@ public class ProductService {
         @CacheEvict(key = "'productByName/' + #name"),
     })
     @Transactional
-    public void updateProduct(Long product, String name, String description, BigDecimal price, ProductEntity.Status status, ProductEntity.Type type) {
+    public Optional<ProductEntity> editProduct(Long product, String name, String description, BigDecimal price, ProductEntity.Status status, ProductEntity.Type type) {
+        return Optional.of(productRepository.findById(product))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .map(reply -> {
+                if (name != null && !name.isEmpty() && !name.isBlank())
+                    reply.setName(name);
+                if (description != null && !description.isEmpty() && !description.isBlank())
+                    reply.setDescription(description);
+                if (price != null && !price.equals(BigDecimal.ZERO))
+                    reply.setPrice(price);
+                if (status != null)
+                    reply.setStatus(status);
+                if (type != null)
+                    reply.setType(type);
+                var save = productRepository.save(reply);
+                log.debug("The product has been edited: {}", save);
+                return save;
+            });
     }
 
 
