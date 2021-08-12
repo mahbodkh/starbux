@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Created by Ebrahim Kh.
@@ -32,10 +33,17 @@ public class UserServiceTest {
     @Transactional
     public void testInsertUser() throws Exception {
         var user = buildUserEntity();
-        userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var userPersisted =
+            userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
 
-        var userExist = userRepository.existsById(user.getId());
-        assertEquals(userExist, Boolean.TRUE);
+        var userExist = userRepository.existsById(userPersisted.getId());
+        assertTrue(userExist);
+        assertEquals(UserEntity.Status.PENDING, userPersisted.getStatus());
+        assertEquals(user.getUsername(), userPersisted.getUsername());
+        assertEquals(user.getEmail(), userPersisted.getEmail());
+        assertEquals(user.getName(), userPersisted.getName());
+        assertEquals(user.getFamily(), userPersisted.getFamily());
+        assertTrue(userPersisted.getAuthorities().contains(UserEntity.Authority.USER));
     }
 
 

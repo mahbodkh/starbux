@@ -62,14 +62,14 @@ public class DiscountService {
         return Optional.of(discount);
     }
 
-    protected BigDecimal getDiscountPercentage(CartEntity cart) {
+    private BigDecimal getDiscountPercentage(CartEntity cart) {
         if (cart.calculateTotal().compareTo(RATE_DISCOUNT_CART_LIMIT) < 0) {
             return BigDecimal.ZERO;
         }
         return cart.calculateTotal().multiply(RATE_DISCOUNT_VALUE);
     }
 
-    protected BigDecimal getDiscountByLowestProduct(CartEntity cart) {
+    private BigDecimal getDiscountByLowestProduct(CartEntity cart) {
         var mainProduct = cart.getDetailEntities().stream()
             .filter(p -> p.getType().equals(ProductEntity.Type.MAIN))
             .collect(Collectors.toList());
