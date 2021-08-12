@@ -54,9 +54,6 @@ public class AccountEntity {
     @Column(name = "\"user\"")
     @NotNull
     private Long userEntity;
-    @Column(name = "comment")
-    @Size(max = 200)
-    private String comment;
     @Column(name = "available")
     @Digits(integer = 18, fraction = 18)
     @NotNull
@@ -75,24 +72,21 @@ public class AccountEntity {
 
     @Builder(toBuilder = true)
     public AccountEntity(Long id, Status status, Long userEntity, Date created,
-                         Date changed, String comment, BigDecimal available, BigDecimal credit) {
+                         Date changed, BigDecimal available, BigDecimal credit) {
         setId(id);
         setStatus(status);
         setUserEntity(userEntity);
         setCreated(created);
         setChanged(changed);
-        setComment(comment);
         setAvailable(available);
         setCredit(credit);
     }
 
     @Transient
-    public static AccountEntity getAccount(Long userEntity) {
+    public static AccountEntity getBasicAccount(Long userEntity) {
         return AccountEntity.builder()
             .userEntity(userEntity)
             .status(Status.ACTIVE)
-            .created(new Date())
-            .changed(new Date())
             .available(BigDecimal.ZERO)
             .credit(BigDecimal.ZERO)
             .build();

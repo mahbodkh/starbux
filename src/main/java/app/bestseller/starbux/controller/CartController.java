@@ -47,7 +47,7 @@ public class CartController {
         var user = userService.loadByUsername(UserUtils.getAuthenticatedUsername());
         if (ObjectUtils.isEmpty(user))
             throw new NotFoundException("Your account has not found.");
-        cartService.createCart(user, request.getProduct(), request.getQuantity());
+        cartService.createOrUpdateCart(user, request.getProduct(), request.getQuantity());
     }
 
     @GetMapping("/")
@@ -55,9 +55,9 @@ public class CartController {
         var user = userService.loadByUsername(UserUtils.getAuthenticatedUsername());
         if (ObjectUtils.isEmpty(user))
             throw new NotFoundException("Your account has not found.");
-        var reply = cartService.loadCurrentCartByUser(user);
+        var reply = cartService.loadCartsByUser(user.getId());
         var orderProductReplies = new ArrayList<OrderProductReply>();
-        reply.getDetailEntities().forEach(p ->
+        reply.getProductItems().forEach(p ->
             orderProductReplies.add(new OrderProductReply(
                 p.getProduct(),
                 p.getQuantity(),
@@ -86,7 +86,7 @@ public class CartController {
     public ResponseEntity<CartReply> getCart(@PathVariable("id") Long cart) {
         var reply = cartService.loadCart(cart);
         var orderProductReplies = new ArrayList<OrderProductReply>();
-        reply.getDetailEntities().forEach(p ->
+        reply.getProductItems().forEach(p ->
             orderProductReplies.add(new OrderProductReply(
                 p.getProduct(),
                 p.getQuantity(),

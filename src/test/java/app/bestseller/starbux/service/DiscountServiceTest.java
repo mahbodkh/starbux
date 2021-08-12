@@ -1,8 +1,8 @@
 package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.CartEntity;
-import app.bestseller.starbux.domain.CartProductDetailEntity;
 import app.bestseller.starbux.domain.ProductEntity;
+import app.bestseller.starbux.domain.PropertyItemEntity;
 import app.bestseller.starbux.domain.UserEntity;
 import app.bestseller.starbux.repository.ProductRepository;
 import app.bestseller.starbux.repository.UserRepository;
@@ -12,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -47,7 +46,6 @@ public class DiscountServiceTest {
         var discountEntity = discountService.applyRules(cart);
 
 
-
     }
 
 
@@ -55,20 +53,20 @@ public class DiscountServiceTest {
         var cart = new CartEntity();
         cart.setStatus(CartEntity.Status.OPEN);
         cart.setUser(user.getId());
-        cart.setDetailEntities(buildProductDetailEntity());
+        cart.setProductItems(buildProductDetailEntity());
         return cart;
     }
 
-    private List<CartProductDetailEntity> buildProductDetailEntity() {
-        var productDetails = new ArrayList<CartProductDetailEntity>();
-        var entityFirst = new CartProductDetailEntity();
+    private Set<PropertyItemEntity> buildProductDetailEntity() {
+        var productDetails = new HashSet<PropertyItemEntity>();
+        var entityFirst = new PropertyItemEntity();
         entityFirst.setProduct(productFirst.getId());
         entityFirst.setQuantity(2);
         entityFirst.setType(productFirst.getType());
         entityFirst.setPrice(productFirst.getPrice());
         productDetails.add(entityFirst);
 
-        var entitySecond = new CartProductDetailEntity();
+        var entitySecond = new PropertyItemEntity();
         entitySecond.setProduct(productSecond.getId());
         entitySecond.setQuantity(1);
         entitySecond.setType(productSecond.getType());

@@ -1,7 +1,7 @@
 package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.CartEntity;
-import app.bestseller.starbux.domain.CartProductDetailEntity;
+import app.bestseller.starbux.domain.PropertyItemEntity;
 import app.bestseller.starbux.domain.ProductEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -70,14 +70,14 @@ public class DiscountService {
     }
 
     private BigDecimal getDiscountByLowestProduct(CartEntity cart) {
-        var mainProduct = cart.getDetailEntities().stream()
+        var mainProduct = cart.getProductItems().stream()
             .filter(p -> p.getType().equals(ProductEntity.Type.MAIN))
             .collect(Collectors.toList());
         if (mainProduct.size() < DISCOUNT_BY_AMOUNT_LIMIT) {
             return BigDecimal.ZERO;
         }
-        return cart.getDetailEntities().stream()
-            .min(Comparator.comparing(CartProductDetailEntity::getPrice))
+        return cart.getProductItems().stream()
+            .min(Comparator.comparing(PropertyItemEntity::getPrice))
             .orElseThrow(NoSuchElementException::new)
             .getPrice();
     }

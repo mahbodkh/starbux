@@ -1,11 +1,12 @@
 package app.bestseller.starbux.domain;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.util.ObjectUtils;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,10 +21,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.math.BigDecimal;
-import java.util.Collections;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created by Ebrahim Kh.
@@ -33,7 +34,16 @@ import java.util.Objects;
 @Data
 @NoArgsConstructor
 @Entity
-public class CartEntity {
+public class CartEntity implements Comparable<CartEntity> {
+
+//    private static final ObjectMapper OBJECT_MAPPER
+//        = new ObjectMapper();
+
+    @Override
+    public int compareTo(@NotNull CartEntity o) {
+        return getCreated().compareTo(o.getCreated());
+    }
+
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,15 +59,58 @@ public class CartEntity {
     @Column(name = "changed")
     @UpdateTimestamp
     private Date changed;
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private List<CartProductDetailEntity> detailEntities = Collections.emptyList();
+    @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<PropertyItemEntity> productItems = new HashSet<>();
+
+
+//    @Transient
+//    private <T> T getPropertiesByType(Class<T> classType) {
+//        var props = Optional.ofNullable(getProperties()).orElseGet(HashMap::new);
+//        setProperties(props);
+//        return OBJECT_MAPPER.convertValue(props, classType);
+//    }
+//
+//    @SuppressWarnings("unchecked")
+//    @Transient
+//    private <T> void setPropertiesByType(T t) {
+//        var newMap = OBJECT_MAPPER.convertValue(t, Map.class);
+//        setProperties(newMap);
+//    }
+
+//    @Transient
+//    public ProductProperties getProductProperties() {
+//        return getPropertiesByType(ProductProperties.class);
+//    }
+//
+//    @Transient
+//    public void setProductProperties(ProductProperties emailProperties) {
+//        setPropertiesByType(emailProperties);
+//    }
+
+//    @NoArgsConstructor
+//    @AllArgsConstructor
+//    @Data
+//    @JsonIgnoreProperties(ignoreUnknown = true)
+//    @Builder
+//    public static class ProductProperties {
+//        private Long product;
+//        private Integer quantity = 1;
+//        private ProductEntity.Type type;
+//        private BigDecimal price = BigDecimal.ZERO;
+//        private BigDecimal total = BigDecimal.ZERO;
+//
+//        public BigDecimal getTotal() {
+//            return getPrice().multiply(BigDecimal.valueOf(quantity));
+//        }
+//    }
+
 
     @Builder(toBuilder = true)
-    public CartEntity(Long id, Long user, Status status, Date created, Date changed, List<CartProductDetailEntity> detailEntities) {
+    public CartEntity(Long id, Long user, Status status, Date created, Date changed, Set<PropertyItemEntity> productItems) {
         setId(id);
         setUser(user);
         setStatus(status);
-        setDetailEntities(detailEntities);
+        setProductItems(productItems);
         setCreated(created);
         setChanged(changed);
     }
@@ -73,20 +126,20 @@ public class CartEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         CartEntity that = (CartEntity) o;
-        return Objects.equals(id, that.id) && Objects.equals(user, that.user) && Objects.equals(created, that.created) && Objects.equals(changed, that.changed) && Objects.equals(detailEntities, that.detailEntities);
+        return Objects.equals(id, that.id) && Objects.equals(user, that.user) && Objects.equals(created, that.created);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, user, created, changed, detailEntities);
+        return Objects.hash(id, user, created);
     }
 
 
     @Transient
-    public static CartEntity getBasicCart(Long user, List<CartProductDetailEntity> detailEntities) {
+    public static CartEntity getBasicCart(Long user) {
         return CartEntity.builder()
             .user(user)
-            .detailEntities(detailEntities)
+            .productItems(Set.of())
             .status(Status.OPEN)
             .build();
     }
@@ -95,7 +148,7 @@ public class CartEntity {
     @Transient
     public BigDecimal calculateTotal() {
         BigDecimal total = BigDecimal.ZERO;
-        detailEntities.forEach(productDetail -> {
+        getProductItems().forEach(productDetail -> {
             total.add(productDetail.getTotal());
         });
         return total;
@@ -130,16 +183,11 @@ public class CartEntity {
 //        }
 //        return totalAmount;
 //    }
-//
-//    public void addCartItem(CartItem cartItem) {
-//        if (ObjectUtils.isEmpty(cartItems)) {
-//            cartItems = new ArrayList<>();
-//        }
-//        cartItems.add(cartItem);
-//    }
-//
 
 
+    public void addOrUpdateProductToCart(PropertyItemEntity property) {
+        productItems.add(property);
+    }
 
 
 }
