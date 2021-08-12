@@ -75,12 +75,13 @@ public class ProductController {
 
     @PostMapping("/admin/create/")
     @ResponseStatus(HttpStatus.OK)
-    public void createUserByAdmin(@Valid @RequestBody ProductRequest request) throws BadRequestException {
+    public void createProduct(@Valid @RequestBody ProductRequest request) throws BadRequestException {
         productService.createProduct(
             request.getName(),
             request.getDescription(),
             BigDecimal.valueOf(request.getPrice()),
-            request.getStatus()
+            ProductEntity.Status.valueOf(request.getStatus()),
+            ProductEntity.Type.valueOf(request.getType())
         );
     }
 
@@ -91,7 +92,8 @@ public class ProductController {
             request.getName(),
             request.getDescription(),
             BigDecimal.valueOf(request.getPrice()),
-            request.getStatus()
+            ProductEntity.Status.valueOf(request.getStatus()),
+            ProductEntity.Type.valueOf(request.getType())
         );
     }
 
@@ -107,7 +109,8 @@ public class ProductController {
         private String name;
         private String description;
         private Double price;
-        private ProductEntity.Status status;
+        private String status;
+        private String type;
     }
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)

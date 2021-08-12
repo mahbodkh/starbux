@@ -6,7 +6,6 @@ import app.bestseller.starbux.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -82,7 +81,7 @@ public class UserServiceTest {
         var userByUsername = userService.loadByUsername(user.getUsername());
 
         assertEquals(save.getId(), userByUsername.getId());
-        assertEquals(save.getUsername(),userByUsername.getUsername());
+        assertEquals(save.getUsername(), userByUsername.getUsername());
     }
 
     @Test
@@ -91,7 +90,7 @@ public class UserServiceTest {
         var user = buildUserEntity();
         userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
 
-        Page<UserEntity> users = userService.loadUsers(Pageable.ofSize(20));
+        var users = userService.loadUsers(Pageable.ofSize(20));
 
         assertEquals(users.getContent().size(), 1);
         assertEquals(users.getTotalElements(), 1);

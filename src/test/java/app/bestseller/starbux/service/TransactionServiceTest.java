@@ -18,10 +18,10 @@ import java.util.Set;
 
 @SpringBootTest
 public class TransactionServiceTest {
-    @Autowired
-    private TransactionService transactionService;
-    @Autowired
-    private TransactionRepository transactionRepository;
+    private @Autowired
+    TransactionService transactionService;
+    private @Autowired
+    TransactionRepository transactionRepository;
 
     @Test
     @Transactional

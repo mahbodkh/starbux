@@ -1,15 +1,17 @@
 package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.ProductEntity;
-import app.bestseller.starbux.domain.UserEntity;
 import app.bestseller.starbux.repository.ProductRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by Ebrahim Kh.
@@ -18,28 +20,52 @@ import java.util.Set;
 @SpringBootTest
 public class ProductServiceTest {
 
-    @Autowired
-    private ProductService productService;
-    @Autowired
-    private ProductRepository productRepository;
+    private @Autowired
+    ProductService productService;
+    private @Autowired
+    ProductRepository productRepository;
 
 
     @Test
     @Transactional
     public void testCreateProduct() throws Exception {
+        var product = buildProductEntity();
+        var save = productService.createProduct(product.getName(), product.getDescription(), product.getPrice(), product.getStatus(), product.getType());
 
+        var productById = productRepository.getById(save.getId());
+        assertEquals(save.getId(), productById.getId());
+        assertEquals(save.getName(), productById.getName());
+        assertEquals(save.getDescription(), productById.getDescription());
+        assertEquals(save.getPrice(), productById.getPrice());
+        assertEquals(save.getType(), productById.getType());
+        assertEquals(save.getStatus(), productById.getStatus());
     }
 
     @Test
     @Transactional
     public void testLoadProduct() throws Exception {
+        var product = buildProductEntity();
+        var save = productService.createProduct(product.getName(), product.getDescription(), product.getPrice(), product.getStatus(), product.getType());
 
+        var productLoad = productService.loadProduct(save.getId());
+        assertEquals(save.getId(), productLoad.getId());
+        assertEquals(save.getName(), productLoad.getName());
+        assertEquals(save.getDescription(), productLoad.getDescription());
+        assertEquals(save.getPrice(), productLoad.getPrice());
+        assertEquals(save.getType(), productLoad.getType());
+        assertEquals(save.getStatus(), productLoad.getStatus());
     }
 
     @Test
     @Transactional
     public void testLoadAllProducts() throws Exception {
+        var product = buildProductEntity();
+        productService.createProduct(product.getName(), product.getDescription(), product.getPrice(), product.getStatus(), product.getType());
 
+        var products = productService.loadProducts(Pageable.ofSize(20));
+
+        assertEquals(products.getContent().size(), 1);
+        assertEquals(products.getTotalElements(), 1);
     }
 
     @Test
@@ -64,17 +90,4 @@ public class ProductServiceTest {
         product.setType(ProductEntity.Type.MAIN);
         return product;
     }
-
-
-    private UserEntity buildUserEntity() {
-        var user = new UserEntity();
-        user.setUsername("username");
-        user.setName("first_name");
-        user.setFamily("last_family");
-        user.setAuthorities(Set.of(UserEntity.Authority.USER));
-        user.setEmail("email@email.com");
-        return user;
-    }
-
-    private ProductEntity product;
 }

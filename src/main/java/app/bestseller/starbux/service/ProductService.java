@@ -31,8 +31,11 @@ public class ProductService {
 
     @Transactional
     @Cacheable(key = "'productByName/' + #name")
-    public void createProduct(String name, String description, BigDecimal price, ProductEntity.Status status) {
-
+    public ProductEntity createProduct(String name, String description, BigDecimal price, ProductEntity.Status status, ProductEntity.Type type) {
+        var product = ProductEntity.getBasicProduct(name, description, price, status, type);
+        var save = productRepository.save(product);
+        log.debug("The product has been persisted: ({})", save);
+        return save;
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +50,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductEntity> loadProducts(Pageable pageable) {
-        return null;
+        return productRepository.findAll(pageable);
     }
 
     @Caching(evict = {
@@ -55,7 +58,7 @@ public class ProductService {
         @CacheEvict(key = "'productByName/' + #name"),
     })
     @Transactional
-    public void updateProduct(Long product, String name, String description, BigDecimal price, ProductEntity.Status status) {
+    public void updateProduct(Long product, String name, String description, BigDecimal price, ProductEntity.Status status, ProductEntity.Type type) {
     }
 
 
