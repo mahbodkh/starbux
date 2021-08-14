@@ -17,31 +17,25 @@ import java.util.Date;
 public interface TransactionRepository extends PagingAndSortingRepository<TransactionEntity, Long> {
 
     @Query(
-        value = "SELECT * FROM best_transaction WHERE user_id = ?1 ORDER BY created DESC",
-        countQuery = "SELECT count(*) FROM best_transaction t WHERE user_id = ?1 ",
+        value = "SELECT * FROM 'best_transaction' t WHERE t.user_id = ?1 ORDER BY t.created DESC",
+        countQuery = "SELECT count(*) FROM 'best_transaction' t WHERE t.user_id = ?1 ",
         nativeQuery = true
     )
     Page<TransactionEntity> findAllByUser(Long user, Pageable pageable);
 
     @Query(
-        value = "SELECT * FROM best_transaction WHERE user_id = ?1 " +
-            "AND created >= ?fromDate AND created <= ?toDate ORDER BY created DESC",
-        countQuery = "SELECT count(*) FROM best_transaction t WHERE user_id = ?1",
+        value = "SELECT * FROM 'best_transaction' t WHERE t.user_id = ?1 " +
+            " AND t.created >= ?2 AND t.created <= ?3 ORDER BY t.created DESC",
+        countQuery = "SELECT count(*) FROM 'best_transaction' t WHERE t.user_id = ?1",
         nativeQuery = true
     )
     Page<TransactionEntity> findAllByDateUser(Long user, Date fromDate, Date toDate, Pageable pageable);
 
-//    @Query(
-//        value = "SELECT * FROM best_transaction WHERE user_id = ?1 AND type IN (?2)  ORDER BY created DESC",
-//        countQuery = "SELECT count(*) FROM best_transaction WHERE user_id = ?1 AND type IN (?2)",
-//        nativeQuery = true
-//    )
-//    List<TransactionEntity> findAllByUserAndTypeIn(Long user, Pageable pageable);
 
     @Query(
-        value = "SELECT * FROM best_transaction WHERE " +
-            "AND created >= ?fromDate AND created <= ?toDate ORDER BY created DESC",
-        countQuery = "SELECT count(*) FROM best_transaction t",
+        value = "SELECT * FROM 'best_transaction' t WHERE " +
+            " t.created >= ?1 AND created <= ?2 ORDER BY created DESC",
+        countQuery = "SELECT count(*) FROM 'best_transaction' t",
         nativeQuery = true
     )
     Page<TransactionEntity> findAllByDate(Date fromDate, Date toDate, Pageable pageable);

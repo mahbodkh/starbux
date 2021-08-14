@@ -31,15 +31,15 @@ public class OrderService {
     public void createOrder(UserEntity user, Long cart) {
         var orderEntity = getOrderByUser(user.getId());
         var cartEntity = cartService.loadCart(cart);
-        var discount = Optional.of(discountService.applyRules(cartEntity))
+        var discount = Optional.of(discountService.applyPromotion(cartEntity))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .orElse(new DiscountService.DiscountEntity());
 
         orderEntity.ifPresent(entity -> changeStatusOrder(entity.getId(), OrderEntity.Status.CANCEL));
 
-        var ready = new OrderEntity(user.getId(), cartEntity.calculateTotal().subtract(discount.getPrice()),
-            discount.getPrice(), cartEntity.calculateTotal(), OrderEntity.Status.OPEN,
+        var ready = new OrderEntity(user.getId(), cartEntity.calculateTotal().subtract(discount.getRate()),
+            discount.getRate(), cartEntity.calculateTotal(), OrderEntity.Status.OPEN,
             cart, user.getId(), new Date(), new Date());
         var save = orderRepository.save(ready);
         log.debug("The order has been persisted: ({}).", save);

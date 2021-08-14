@@ -10,10 +10,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * Created by Ebrahim Kh.
@@ -41,11 +45,13 @@ public class DiscountServiceTest {
     }
 
     @Test
+    @Transactional
     public void testApplyRule() throws Exception {
         var cart = buildCartEntity();
-        var discountEntity = discountService.applyRules(cart);
+        var discountEntity = discountService.applyPromotion(cart).get();
 
-
+        assertEquals(DiscountService.DiscountEntity.Type.PERCENTAGE, discountEntity.getType());
+        assertEquals(BigDecimal.valueOf(7).setScale(2, RoundingMode.HALF_UP), discountEntity.getRate());
     }
 
 
@@ -61,14 +67,14 @@ public class DiscountServiceTest {
         var productDetails = new HashSet<PropertyItemEntity>();
         var entityFirst = new PropertyItemEntity();
         entityFirst.setProduct(productFirst.getId());
-        entityFirst.setQuantity(2);
+        entityFirst.setQuantity(4);
         entityFirst.setType(productFirst.getType());
         entityFirst.setPrice(productFirst.getPrice());
         productDetails.add(entityFirst);
 
         var entitySecond = new PropertyItemEntity();
         entitySecond.setProduct(productSecond.getId());
-        entitySecond.setQuantity(1);
+        entitySecond.setQuantity(2);
         entitySecond.setType(productSecond.getType());
         entitySecond.setPrice(productSecond.getPrice());
         productDetails.add(entitySecond);

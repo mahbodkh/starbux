@@ -1,8 +1,6 @@
 package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.CartEntity;
-import app.bestseller.starbux.domain.PropertyItemEntity;
-import app.bestseller.starbux.domain.ProductEntity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -13,11 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
-import java.util.Comparator;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Created by Ebrahim Kh.
@@ -34,7 +29,7 @@ public class DiscountService {
     private static final Integer DISCOUNT_BY_AMOUNT_LIMIT = 3;
 
 
-    public Optional<DiscountEntity> applyRules(CartEntity cart) {
+    public Optional<DiscountEntity> applyPromotion(CartEntity cart) {
         var discount = selectDiscountForCart(cart);
         if (ObjectUtils.isEmpty(discount)) {
             return Optional.empty();
@@ -52,12 +47,12 @@ public class DiscountService {
             return Optional.empty();
         }
         if (rateDiscountAmount.compareTo(amountDiscountAmount) > 0) {
-            discount.setPrice(rateDiscountAmount);
+            discount.setRate(rateDiscountAmount);
             discount.setType(DiscountEntity.Type.PERCENTAGE);
             return Optional.of(discount);
         }
 
-        discount.setPrice(amountDiscountAmount);
+        discount.setRate(amountDiscountAmount);
         discount.setType(DiscountEntity.Type.PRICE);
         return Optional.of(discount);
     }
@@ -70,16 +65,10 @@ public class DiscountService {
     }
 
     private BigDecimal getDiscountByLowestProduct(CartEntity cart) {
-        var mainProduct = cart.getProductItems().stream()
-            .filter(p -> p.getType().equals(ProductEntity.Type.MAIN))
-            .collect(Collectors.toList());
-        if (mainProduct.size() < DISCOUNT_BY_AMOUNT_LIMIT) {
+        if (cart.countTotalSide() < DISCOUNT_BY_AMOUNT_LIMIT) {
             return BigDecimal.ZERO;
         }
-        return cart.getProductItems().stream()
-            .min(Comparator.comparing(PropertyItemEntity::getPrice))
-            .orElseThrow(NoSuchElementException::new)
-            .getPrice();
+        return cart.minItemPrice();
     }
 
     @NoArgsConstructor
@@ -87,8 +76,7 @@ public class DiscountService {
     public static class DiscountEntity {
 
         private Type type;
-        private Integer quantity;
-        private BigDecimal price;
+        private BigDecimal rate;
 
         public enum Type {
             PERCENTAGE,
@@ -100,12 +88,12 @@ public class DiscountService {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             var that = (DiscountEntity) o;
-            return type == that.type && Objects.equals(quantity, that.quantity) && Objects.equals(price, that.price);
+            return type == that.type && Objects.equals(rate, that.rate);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(type, quantity, price);
+            return Objects.hash(type, rate);
         }
     }
 }

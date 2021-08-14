@@ -21,10 +21,12 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by Ebrahim Kh.
@@ -145,11 +147,26 @@ public class CartEntity implements Comparable<CartEntity> {
 
     @Transient
     public BigDecimal calculateTotal() {
-        BigDecimal total = BigDecimal.ZERO;
-        getProductItems().forEach(productDetail -> {
-            total.add(productDetail.getTotal());
-        });
-        return total;
+        return getProductItems().stream()
+            .map(PropertyItemEntity::getTotal)
+            .filter(Objects::nonNull)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    @Transient
+    public Integer countTotalSide() {
+        return (int) getProductItems().stream()
+            .filter(p -> p.getType().equals(ProductEntity.Type.SIDE))
+            .count();
+    }
+
+    @Transient
+    public BigDecimal minItemPrice() {
+        return getProductItems()
+            .stream()
+            .map(PropertyItemEntity::getPrice)
+            .min(Comparator.naturalOrder())
+            .orElse(BigDecimal.ZERO);
     }
 
 
