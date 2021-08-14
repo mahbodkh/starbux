@@ -24,12 +24,12 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class OrderService {
 
+    @Transactional
     public OrderEntity createOrder(UserEntity user, Long cart) {
         getOrderByUser(user.getId())
-            .ifPresent(entity -> {
-                changeStatusOrder(entity.getId(), OrderEntity.Status.CANCEL);
-                orderRepository.save(entity);
-            });
+            .ifPresent(entity ->
+                changeStatusOrder(entity.getId(), OrderEntity.Status.CANCEL)
+            );
         var cartEntity = cartService.loadCart(cart);
         var discount = discountService.applyPromotion(cartEntity);
         var basicOrder = OrderEntity.getBasicOrder(user.getId(), cart, discount.getRate(), cartEntity.calculateTotal());
@@ -75,7 +75,7 @@ public class OrderService {
             .orElseThrow(() -> new NotFoundException(String.format("Order id (%s) not found for user.", order)));
     }
 
-
+    @Transactional
     public void deleteOrder(Long order) {
         orderRepository
             .findById(order)
