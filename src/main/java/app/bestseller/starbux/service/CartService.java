@@ -20,10 +20,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Created by Ebrahim Kh.
@@ -37,28 +40,24 @@ import java.util.Optional;
 public class CartService {
 
     @Transactional
-    @Cacheable(key = "'cartByUser/' + #user.toString()")
     public CartEntity createOrUpdateCart(UserEntity user, Long productId, Integer quantity) {
         var cartEntity = cartRepository.findByUserAndStatusIn(user.getId(), List.of(CartEntity.Status.OPEN));
         var product = productService.loadProduct(productId);
         if (ObjectUtils.isEmpty(cartEntity)) cartEntity = CartEntity.getBasicCart(user.getId());
-        var productDetailLists = new HashSet<PropertyItemEntity>();
 
-        final var cart = cartEntity;
-        if (cartEntity.getProductItems().size() > 0) {
-            cartEntity.getProductItems().stream()
-                .map(props -> {
-                    return productDetailLists.add(
-                        productPropertyPersistence(props.getId(),
-                            product.getId(), quantity, product.getPrice(), product.getType(), cart
-                        ));
-                });
-        } else {
-            productDetailLists.add(productPropertyPersistence(
-                null, product.getId(), quantity, product.getPrice(), product.getType(), cart));
+        var productItemsMap = new HashMap<Long, PropertyItemEntity>();
+        cartEntity.getProductItems().forEach(item -> productItemsMap.put(item.getProduct(), item));
+
+        if (productItemsMap.containsKey(product.getId())) {
+            var item = productItemsMap.get(product.getId());
+            item.setQuantity(quantity);
+            productItemsMap.put(product.getId(), item);
         }
+        var item = PropertyItemEntity
+            .getBasicProperty(product.getId(), quantity, product.getPrice(), product.getType(), cartEntity);
+        productItemsMap.put(product.getId(), item);
 
-        cartEntity.setProductItems(productDetailLists);
+        cartEntity.setProductItems(new HashSet<>(productItemsMap.values()));
         var save = cartRepository.save(cartEntity);
         log.debug("The cart has been persisted: ({})", save);
         return save;
@@ -69,24 +68,6 @@ public class CartService {
         if (ObjectUtils.isEmpty(productProperty)) {
             propertyItemEntity = PropertyItemEntity.getBasicProperty(product, quantity, price, type, cart);
         }
-//            propertyItemEntity = Optional.of(productPropertyRepository.findById(Objects.requireNonNull(productProperty)))
-//                .filter(Optional::isPresent)
-//                .map(Optional::get)
-//                .filter(props -> product.equals(props.getProduct()))
-//                .map(props -> {
-//                    if (!ObjectUtils.isEmpty(quantity) && quantity > 0)
-//                        props.setQuantity(quantity);
-//                    if (!ObjectUtils.isEmpty(type))
-//                        props.setType(type);
-//                    if (!ObjectUtils.isEmpty(price) && price.compareTo(BigDecimal.ZERO) > 0)
-//                        props.setPrice(price);
-//                    props.setTotal(props.getTotal());
-//                    return props;
-//                }).get();
-
-//        var save = productPropertyRepository.save(Objects.requireNonNull(propertyItemEntity));
-//        log.debug("The cart details has been persisted: ({})", save);
-//        return save;
         return propertyItemEntity;
     }
 

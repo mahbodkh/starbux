@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -15,7 +16,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created by Ebrahim Kh.
@@ -41,9 +44,13 @@ public class PropertyItemEntity {
     private BigDecimal price = BigDecimal.ZERO;
     @Column(name = "total")
     private BigDecimal total = BigDecimal.ZERO;
-    @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "cart_id", referencedColumnName = "id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
     private CartEntity cart;
+
+//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+//    private Set<Long> sideProducts = new HashSet<>();
+
 
     public BigDecimal getTotal() {
         return getPrice().multiply(BigDecimal.valueOf(quantity));

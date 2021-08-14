@@ -1,8 +1,7 @@
 package app.bestseller.starbux.service;
 
-import app.bestseller.starbux.domain.CartEntity;
-import app.bestseller.starbux.domain.PropertyItemEntity;
 import app.bestseller.starbux.domain.ProductEntity;
+import app.bestseller.starbux.domain.PropertyItemEntity;
 import app.bestseller.starbux.domain.UserEntity;
 import app.bestseller.starbux.repository.CartRepository;
 import app.bestseller.starbux.repository.ProductRepository;
@@ -15,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -40,7 +37,8 @@ public class CartServiceTest {
 
     @BeforeEach
     public void prepareCartTest() {
-        user = userRepository.save(buildUserEntity());
+        userFirst = userRepository.save(buildUserEntityFirst());
+        userSecond = userRepository.save(buildUserEntitySecond());
         productFirst = productRepository.save(buildProductEntityFirst());
         productSecond = productRepository.save(buildProductEntitySecond());
     }
@@ -50,13 +48,13 @@ public class CartServiceTest {
     @Transactional
     public void createCart() throws Exception {
         var quantity = 2;
-        var cart = cartService.createOrUpdateCart(user, productFirst.getId(), quantity);
+        var cart = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantity);
 
         var save = cartRepository.findById(cart.getId()).get();
 
         var propertyItemEntity = save.getProductItems().stream().findAny().get();
         assertEquals(cart.getId(), save.getId());
-        assertEquals(user.getId(), save.getUser());
+        assertEquals(userFirst.getId(), save.getUser());
         assertEquals(quantity, propertyItemEntity.getQuantity());
         assertEquals(productFirst.getType(), propertyItemEntity.getType());
         assertEquals(productFirst.getPrice(), propertyItemEntity.getPrice());
@@ -71,72 +69,111 @@ public class CartServiceTest {
     @Transactional
     public void createDuplicateCart() throws Exception {
         var quantity = 2;
-        var cart = cartService.createOrUpdateCart(user, productFirst.getId(), quantity);
+        var cart = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantity);
         quantity = 4;
-        var cartSecond = cartService.createOrUpdateCart(user, productFirst.getId(), quantity);
+        var cartSecond = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantity);
 
-//        assertEquals(cart.getId(), cartSecond.getId());
-//        assertEquals(user.getId(), cartSecond.getUser());
-//        assertEquals(quantity, cartSecond.getProductProperties().get(0).getQuantity());
-//        assertEquals(productFirst.getType(), cartSecond.getProductProperties().get(0).getType());
-//        assertEquals(productFirst.getPrice(), cartSecond.getProductProperties().get(0).getPrice());
-//        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantity)), cartSecond.getProductProperties().get(0).getTotal());
-//        assertEquals(1, cartSecond.getProductProperties().size());
-//        assertEquals(cart.getProductProperties().get(0).getProduct(), cartSecond.getProductProperties().get(0).getProduct());
+        assertEquals(cart.getId(), cartSecond.getId());
+        assertEquals(userFirst.getId(), cartSecond.getUser());
+        var propertyItemEntity = cartSecond.getProductItems().stream().findFirst().get();
+
+        assertEquals(quantity, propertyItemEntity.getQuantity());
+        assertEquals(productFirst.getType(), propertyItemEntity.getType());
+        assertEquals(productFirst.getPrice(), propertyItemEntity.getPrice());
+        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantity)), propertyItemEntity.getTotal());
+        assertEquals(1, cartSecond.getProductItems().size());
+        assertEquals(cart.getProductItems().stream().findFirst().get().getProduct(),
+            propertyItemEntity.getProduct());
     }
 
 
     @Test
     @Transactional
-    public void loadCart() throws Exception {
+    public void testLoadCart_ByCartId() throws Exception {
         var quantity = 2;
-        var cart = cartService.createOrUpdateCart(user, productFirst.getId(), quantity);
+        var cart = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantity);
 
         var cartLoad = cartService.loadCart(cart.getId());
+        var item = cartLoad.getProductItems().stream().findFirst().get();
 
-//        assertEquals(cart.getId(), cartLoad.getId());
-//        assertEquals(user.getId(), cartLoad.getUser());
-//        assertEquals(quantity, cartLoad.getProductProperties().get(0).getQuantity());
-//        assertEquals(productFirst.getType(), cartLoad.getProductProperties().get(0).getType());
-//        assertEquals(productFirst.getPrice(), cartLoad.getProductProperties().get(0).getPrice());
-//        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantity)), cartLoad.getProductProperties().get(0).getTotal());
-//        assertEquals(1, cartLoad.getProductProperties().size());
-//        assertEquals(cart.getProductProperties().get(0).getProduct(), cartLoad.getProductProperties().get(0).getProduct());
+        assertEquals(cart.getId(), cartLoad.getId());
+        assertEquals(userFirst.getId(), cartLoad.getUser());
+        assertEquals(quantity, item.getQuantity());
+        assertEquals(productFirst.getType(), item.getType());
+        assertEquals(productFirst.getPrice(), item.getPrice());
+        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantity)), item.getTotal());
+        assertEquals(cart.getProductItems().stream().findFirst().get().getProduct(), item.getProduct());
+        assertEquals(1, cartLoad.getProductItems().size());
     }
 
     @Test
-//    @Transactional
-    public void testEditCart() throws Exception {
-        user = userRepository.save(buildUserEntity());
-        productFirst = productRepository.save(buildProductEntityFirst());
-        productSecond = productRepository.save(buildProductEntitySecond());
-
+    @Transactional
+    public void testCreateOrUpdateCart_AddItemToCart() throws Exception {
         var quantityFirst = 2;
-        var cart = cartService.createOrUpdateCart(user, productFirst.getId(), quantityFirst);
-
+        var cart = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantityFirst);
         var quantitySecond = 4;
-        var cartSecond = cartService.createOrUpdateCart(user, productSecond.getId(), quantitySecond);
+        var cartSecond = cartService.createOrUpdateCart(userFirst, productSecond.getId(), quantitySecond);
 
-//        assertEquals(cart.getId(), cartSecond.getId());
-//        assertEquals(user.getId(), cartSecond.getUser());
-//
-//        var properties = cartSecond.getProductProperties();
-//        assertEquals(quantityFirst, properties.get(0).getQuantity());
-//        assertEquals(quantitySecond, properties.get(1).getQuantity());
-//
-//        assertEquals(productFirst.getType(), cartSecond.getProductProperties().get(0).getType());
-//        assertEquals(productSecond.getType(), cartSecond.getProductProperties().get(1).getType());
-//
-//        assertEquals(productFirst.getPrice(), cartSecond.getProductProperties().get(0).getPrice());
-//        assertEquals(productSecond.getPrice(), cartSecond.getProductProperties().get(1).getPrice());
-//
-//        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantityFirst)), cartSecond.getProductProperties().get(0).getTotal());
-//        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantitySecond)), cartSecond.getProductProperties().get(1).getTotal());
-//
-//        assertEquals(productFirst.getId(), cartSecond.getProductProperties().get(0).getProduct());
-//        assertEquals(productSecond.getId(), cartSecond.getProductProperties().get(1).getProduct());
-//
-//        assertEquals(2, cartSecond.getProductProperties().size());
+        var items = new ArrayList<PropertyItemEntity>(cartSecond.getProductItems());
+        assertEquals(cart.getId(), cartSecond.getId());
+        assertEquals(userFirst.getId(), cartSecond.getUser());
+        assertEquals(2, items.size());
+
+        var itemFirst = items.stream().filter(i -> i.getProduct().equals(productFirst.getId())).findAny().get();
+        var itemSecond = items.stream().filter(i -> i.getProduct().equals(productSecond.getId())).findAny().get();
+
+        assertEquals(quantityFirst, itemFirst.getQuantity());
+        assertEquals(quantitySecond, itemSecond.getQuantity());
+
+        assertEquals(productFirst.getType(), itemFirst.getType());
+        assertEquals(productSecond.getType(), itemSecond.getType());
+
+        assertEquals(productFirst.getPrice(), itemFirst.getPrice());
+        assertEquals(productSecond.getPrice(), itemSecond.getPrice());
+
+        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantityFirst)), itemFirst.getTotal());
+        assertEquals(productSecond.getPrice().multiply(BigDecimal.valueOf(quantitySecond)), itemSecond.getTotal());
+
+        assertEquals(productFirst.getId(), itemFirst.getProduct());
+        assertEquals(productSecond.getId(), itemSecond.getProduct());
+    }
+
+    @Test
+    @Transactional
+    public void testCreateOrUpdateCart_AddItemToCart_ThenUpdateItem() throws Exception {
+        var quantityFirst = 2;
+        var cartEntityFirst = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantityFirst);
+        var quantitySecond = 4;
+        var cartEntitySecond = cartService.createOrUpdateCart(userFirst, productSecond.getId(), quantitySecond);
+
+        var quantityFirstUpdate = 5;
+        var cartEntityFirstUpdated = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantityFirstUpdate);
+
+        var items = new ArrayList<PropertyItemEntity>(cartEntitySecond.getProductItems());
+        assertEquals(cartEntityFirst.getId(), cartEntitySecond.getId());
+        assertEquals(cartEntityFirst.getId(), cartEntityFirstUpdated.getId());
+        assertEquals(userFirst.getId(), cartEntityFirst.getUser());
+        assertEquals(userFirst.getId(), cartEntitySecond.getUser());
+        assertEquals(userFirst.getId(), cartEntityFirstUpdated.getUser());
+        assertEquals(2, items.size());
+
+        var itemFirst = items.stream().filter(i -> i.getProduct().equals(productFirst.getId())).findAny().get();
+        var itemSecond = items.stream().filter(i -> i.getProduct().equals(productSecond.getId())).findAny().get();
+
+        assertEquals(quantityFirstUpdate, itemFirst.getQuantity());
+        assertEquals(quantitySecond, itemSecond.getQuantity());
+
+        assertEquals(productFirst.getType(), itemFirst.getType());
+        assertEquals(productSecond.getType(), itemSecond.getType());
+
+        assertEquals(productFirst.getPrice(), itemFirst.getPrice());
+        assertEquals(productSecond.getPrice(), itemSecond.getPrice());
+
+        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantityFirstUpdate)), itemFirst.getTotal());
+        assertEquals(productSecond.getPrice().multiply(BigDecimal.valueOf(quantitySecond)), itemSecond.getTotal());
+
+        assertEquals(productFirst.getId(), itemFirst.getProduct());
+        assertEquals(productSecond.getId(), itemSecond.getProduct());
     }
 
 
@@ -144,59 +181,70 @@ public class CartServiceTest {
     @Transactional
     public void loadCartsByUser() throws Exception {
         var quantity = 2;
-        var cart = cartService.createOrUpdateCart(user, productFirst.getId(), quantity);
+        var cart = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantity);
 
-        var cartLoadByUser = cartService.loadCartsByUser(user.getId());
+        var cartLoadByUser = cartService.loadCartsByUser(userFirst.getId());
+        var item = cartLoadByUser.getProductItems().stream().findFirst().get();
 
-//        assertEquals(cart.getId(), cartLoadByUser.getId());
-//        assertEquals(user.getId(), cartLoadByUser.getUser());
-//        assertEquals(quantity, cartLoadByUser.getProductProperties().get(0).getQuantity());
-//        assertEquals(productFirst.getType(), cartLoadByUser.getProductProperties().get(0).getType());
-//        assertEquals(productFirst.getPrice(), cartLoadByUser.getProductProperties().get(0).getPrice());
-//        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantity)), cartLoadByUser.getProductProperties().get(0).getTotal());
-//        assertEquals(1, cartLoadByUser.getProductProperties().size());
-//        assertEquals(cart.getProductProperties().get(0).getProduct(), cartLoadByUser.getProductProperties().get(0).getProduct());
+        assertEquals(cart.getId(), cartLoadByUser.getId());
+        assertEquals(userFirst.getId(), cartLoadByUser.getUser());
+        assertEquals(quantity, item.getQuantity());
+        assertEquals(productFirst.getType(), item.getType());
+        assertEquals(productFirst.getPrice(), item.getPrice());
+        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantity)), item.getTotal());
+        assertEquals(1, cartLoadByUser.getProductItems().size());
+        assertEquals(cart.getProductItems().stream().findAny().get().getProduct(), item.getProduct());
+    }
 
+    @Test
+    @Transactional
+    public void testLoadCartsByUser_twoUser() throws Exception {
+        var quantityFirstUser = 2;
+        var cartFirstUser = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantityFirstUser);
+        var quantitySecondUser = 5;
+        var cartSecondUser = cartService.createOrUpdateCart(userSecond, productSecond.getId(), quantitySecondUser);
+
+        var cartLoadByFirstUser = cartService.loadCartsByUser(userFirst.getId());
+        var cartLoadBySecondUser = cartService.loadCartsByUser(userSecond.getId());
+
+        var itemFirstUser = cartLoadByFirstUser.getProductItems().stream().findFirst().get();
+        var itemSecondUser = cartLoadBySecondUser.getProductItems().stream().findFirst().get();
+
+        assertEquals(cartFirstUser.getId(), cartLoadByFirstUser.getId());
+        assertEquals(cartSecondUser.getId(), cartLoadBySecondUser.getId());
+
+        assertEquals(userFirst.getId(), cartLoadByFirstUser.getUser());
+        assertEquals(userSecond.getId(), cartLoadBySecondUser.getUser());
+
+        assertEquals(quantityFirstUser, itemFirstUser.getQuantity());
+        assertEquals(quantitySecondUser, itemSecondUser.getQuantity());
+
+        assertEquals(productFirst.getType(), itemFirstUser.getType());
+        assertEquals(productSecond.getType(), itemSecondUser.getType());
+
+        assertEquals(productFirst.getPrice(), itemFirstUser.getPrice());
+        assertEquals(productSecond.getPrice(), itemSecondUser.getPrice());
+
+        assertEquals(productFirst.getPrice().multiply(BigDecimal.valueOf(quantityFirstUser)), itemFirstUser.getTotal());
+        assertEquals(productSecond.getPrice().multiply(BigDecimal.valueOf(quantitySecondUser)), itemSecondUser.getTotal());
+
+        assertEquals(1, cartLoadByFirstUser.getProductItems().size());
+        assertEquals(1, cartLoadBySecondUser.getProductItems().size());
+
+        assertEquals(cartFirstUser.getProductItems().stream().findAny().get().getProduct(), itemFirstUser.getProduct());
+        assertEquals(cartSecondUser.getProductItems().stream().findAny().get().getProduct(), itemSecondUser.getProduct());
     }
 
     @Test
     @Transactional
     public void testDeleteCart() throws Exception {
         var quantity = 2;
-        var cart = cartService.createOrUpdateCart(user, productFirst.getId(), quantity);
+        var cart = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantity);
 
         cartService.deleteCart(cart.getId());
 
         var cartDeleted = cartRepository.existsById(cart.getId());
         assertFalse(cartDeleted);
-    }
-
-
-    private CartEntity buildCartEntity() {
-        var cart = new CartEntity();
-        cart.setStatus(CartEntity.Status.OPEN);
-        cart.setUser(user.getId());
-        cart.setProductItems(buildProductDetailEntity());
-        return cart;
-    }
-
-    private Set<PropertyItemEntity> buildProductDetailEntity() {
-        var productDetails = new HashSet<PropertyItemEntity>();
-        var entityFirst = new PropertyItemEntity();
-        entityFirst.setProduct(productFirst.getId());
-        entityFirst.setQuantity(2);
-        entityFirst.setType(productFirst.getType());
-        entityFirst.setPrice(productFirst.getPrice());
-        productDetails.add(entityFirst);
-
-        var entitySecond = new PropertyItemEntity();
-        entitySecond.setProduct(productSecond.getId());
-        entitySecond.setQuantity(1);
-        entitySecond.setType(productSecond.getType());
-        entitySecond.setPrice(productSecond.getPrice());
-        productDetails.add(entitySecond);
-
-        return productDetails;
     }
 
     private ProductEntity buildProductEntityFirst() {
@@ -219,18 +267,30 @@ public class CartServiceTest {
         return product;
     }
 
-    private UserEntity buildUserEntity() {
+    private UserEntity buildUserEntityFirst() {
         var user = new UserEntity();
-        user.setUsername("username");
-        user.setName("first_name");
-        user.setFamily("last_family");
+        user.setUsername("username_first");
+        user.setName("first_name_first");
+        user.setFamily("last_family_first");
         user.setAuthorities(Set.of(UserEntity.Authority.USER));
         user.setStatus(UserEntity.Status.ACTIVE);
-        user.setEmail("email@email.com");
+        user.setEmail("email_first@email.com");
         return user;
     }
 
-    private UserEntity user;
+    private UserEntity buildUserEntitySecond() {
+        var user = new UserEntity();
+        user.setUsername("username_second");
+        user.setName("first_name_second");
+        user.setFamily("last_family_second");
+        user.setAuthorities(Set.of(UserEntity.Authority.USER));
+        user.setStatus(UserEntity.Status.ACTIVE);
+        user.setEmail("email_second@email.com");
+        return user;
+    }
+
+    private UserEntity userFirst;
+    private UserEntity userSecond;
     private ProductEntity productFirst;
     private ProductEntity productSecond;
 }

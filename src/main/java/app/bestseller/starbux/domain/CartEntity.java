@@ -1,11 +1,11 @@
 package app.bestseller.starbux.domain;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.Where;
 import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.CascadeType;
@@ -36,9 +36,6 @@ import java.util.Set;
 @Entity
 public class CartEntity implements Comparable<CartEntity> {
 
-//    private static final ObjectMapper OBJECT_MAPPER
-//        = new ObjectMapper();
-
     @Override
     public int compareTo(@NotNull CartEntity o) {
         return getCreated().compareTo(o.getCreated());
@@ -59,7 +56,8 @@ public class CartEntity implements Comparable<CartEntity> {
     @Column(name = "changed")
     @UpdateTimestamp
     private Date changed;
-    @OneToMany(mappedBy = "cart", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @Where(clause = "DELETED=0")
     private Set<PropertyItemEntity> productItems = new HashSet<>();
 
 
