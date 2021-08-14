@@ -1,5 +1,6 @@
 package app.bestseller.starbux.domain;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
@@ -13,6 +14,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.Objects;
@@ -58,6 +60,7 @@ public class OrderEntity {
         CANCEL
     }
 
+    @Builder(toBuilder = true)
     public OrderEntity(Long id, BigDecimal price, BigDecimal discount, BigDecimal total, Status status, Long cart, Long user, Date created, Date changed) {
         setId(id);
         setPrice(price);
@@ -82,5 +85,17 @@ public class OrderEntity {
     @Override
     public int hashCode() {
         return Objects.hash(price, discount, total, status);
+    }
+
+    @Transient
+    public OrderEntity getBasicOrder(Long user, Long cart, BigDecimal discount, BigDecimal total) {
+        return OrderEntity.builder()
+            .user(user)
+            .cart(cart)
+            .discount(discount)
+            .total(total)
+            .price(total.subtract(discount))
+            .status(Status.OPEN)
+            .build();
     }
 }
