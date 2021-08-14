@@ -8,10 +8,7 @@ import app.bestseller.starbux.repository.CartRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -19,7 +16,6 @@ import org.springframework.util.ObjectUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -61,7 +57,6 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(key = "'cartById/' + #cart.toString()")
     public CartEntity loadCart(Long cart) {
         return Optional.of(cartRepository.findById(cart))
             .filter(Optional::isPresent)
@@ -70,12 +65,10 @@ public class CartService {
     }
 
     @Transactional(readOnly = true)
-    @Cacheable(key = "'cartById/' + #user.toString()")
     public CartEntity loadCartsByUser(Long user) {
         return cartRepository.findByUserAndStatusIn(user, List.of(CartEntity.Status.OPEN));
     }
 
-    @CacheEvict(key = "'cartById/' + #cart.toString()")
     @Transactional
     public void deleteCart(Long cart) {
         cartRepository
@@ -84,17 +77,10 @@ public class CartService {
                 entity -> {
                     cartRepository.delete(entity);
                     log.debug("Deleted User: {}", entity);
-                    clearCartCaches("'cartByUser/'" + entity.getUser().toString());
                 }
             );
     }
 
-    private void clearCartCaches(String cache) {
-        Objects.requireNonNull(cacheManager.getCache(cache)).evict(cache);
-        log.debug("Cashes has been evicted by ({})", cache);
-    }
-
     private final ProductService productService;
     private final CartRepository cartRepository;
-    private final CacheManager cacheManager;
 }
