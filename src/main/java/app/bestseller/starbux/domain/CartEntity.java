@@ -142,8 +142,4 @@ public class CartEntity implements Comparable<CartEntity> {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public void addOrUpdateProductToCart(PropertyItemEntity property) {
-        productItems.add(property);
-    }
-
 }
