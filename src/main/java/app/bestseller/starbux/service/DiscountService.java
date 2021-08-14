@@ -1,6 +1,7 @@
 package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.CartEntity;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -29,32 +30,23 @@ public class DiscountService {
     private static final Integer DISCOUNT_BY_AMOUNT_LIMIT = 3;
 
 
-    public Optional<DiscountEntity> applyPromotion(CartEntity cart) {
-        var discount = selectDiscountForCart(cart);
-        if (ObjectUtils.isEmpty(discount)) {
-            return Optional.empty();
-        }
-        return discount;
+    public DiscountEntity applyPromotion(CartEntity cart) {
+        return selectDiscountForCart(cart);
     }
 
-    private Optional<DiscountEntity> selectDiscountForCart(CartEntity cart) {
+    private DiscountEntity selectDiscountForCart(CartEntity cart) {
         var rateDiscountAmount = getDiscountPercentage(cart);
         var amountDiscountAmount = getDiscountByLowestProduct(cart);
-        var discount = new DiscountEntity();
 
         if (rateDiscountAmount.compareTo(BigDecimal.ZERO) == 0 && amountDiscountAmount.compareTo(BigDecimal.ZERO) == 0) {
             log.debug("Discount is not available.");
-            return Optional.empty();
-        }
-        if (rateDiscountAmount.compareTo(amountDiscountAmount) > 0) {
-            discount.setRate(rateDiscountAmount);
-            discount.setType(DiscountEntity.Type.PERCENTAGE);
-            return Optional.of(discount);
+            return new DiscountEntity(BigDecimal.ZERO, DiscountEntity.Type.UNKNOWN);
         }
 
-        discount.setRate(amountDiscountAmount);
-        discount.setType(DiscountEntity.Type.PRICE);
-        return Optional.of(discount);
+        if (rateDiscountAmount.compareTo(amountDiscountAmount) > 0) {
+            return new DiscountEntity(rateDiscountAmount, DiscountEntity.Type.PERCENTAGE);
+        }
+        return new DiscountEntity(amountDiscountAmount, DiscountEntity.Type.PRICE);
     }
 
     private BigDecimal getDiscountPercentage(CartEntity cart) {
@@ -72,15 +64,16 @@ public class DiscountService {
     }
 
     @NoArgsConstructor
+    @AllArgsConstructor
     @Data
     public static class DiscountEntity {
-
-        private Type type;
         private BigDecimal rate;
+        private Type type;
 
         public enum Type {
             PERCENTAGE,
-            PRICE
+            PRICE,
+            UNKNOWN
         }
 
         @Override

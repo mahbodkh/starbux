@@ -76,7 +76,7 @@ public class CartService {
             .ifPresent(
                 entity -> {
                     cartRepository.delete(entity);
-                    log.debug("Deleted User: {}", entity);
+                    log.debug("Deleted cart: ({}).", entity);
                 }
             );
     }

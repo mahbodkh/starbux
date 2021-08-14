@@ -88,11 +88,11 @@ public class OrderEntity {
     }
 
     @Transient
-    public OrderEntity getBasicOrder(Long user, Long cart, BigDecimal discount, BigDecimal total) {
+    public static OrderEntity getBasicOrder(Long user, Long cart, BigDecimal discount, BigDecimal total) {
         return OrderEntity.builder()
             .user(user)
             .cart(cart)
-            .discount(discount)
+            .discount(discount.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : discount )
             .total(total)
             .price(total.subtract(discount))
             .status(Status.OPEN)

@@ -48,7 +48,7 @@ public class DiscountServiceTest {
     @Transactional
     public void testApplyRule() throws Exception {
         var cart = buildCartEntity();
-        var discountEntity = discountService.applyPromotion(cart).get();
+        var discountEntity = discountService.applyPromotion(cart);
 
         assertEquals(DiscountService.DiscountEntity.Type.PERCENTAGE, discountEntity.getType());
         assertEquals(BigDecimal.valueOf(7).setScale(2, RoundingMode.HALF_UP), discountEntity.getRate());

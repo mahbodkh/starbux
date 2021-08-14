@@ -8,13 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 /**
@@ -28,21 +24,18 @@ import java.util.Optional;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class OrderService {
 
-    public void createOrder(UserEntity user, Long cart) {
-        var orderEntity = getOrderByUser(user.getId());
+    public OrderEntity createOrder(UserEntity user, Long cart) {
+        getOrderByUser(user.getId())
+            .ifPresent(entity -> {
+                changeStatusOrder(entity.getId(), OrderEntity.Status.CANCEL);
+                orderRepository.save(entity);
+            });
         var cartEntity = cartService.loadCart(cart);
-        var discount = Optional.of(discountService.applyPromotion(cartEntity))
-            .filter(Optional::isPresent)
-            .map(Optional::get)
-            .orElse(new DiscountService.DiscountEntity());
-
-        orderEntity.ifPresent(entity -> changeStatusOrder(entity.getId(), OrderEntity.Status.CANCEL));
-
-        var ready = new OrderEntity(user.getId(), cartEntity.calculateTotal().subtract(discount.getRate()),
-            discount.getRate(), cartEntity.calculateTotal(), OrderEntity.Status.OPEN,
-            cart, user.getId(), new Date(), new Date());
-        var save = orderRepository.save(ready);
+        var discount = discountService.applyPromotion(cartEntity);
+        var basicOrder = OrderEntity.getBasicOrder(user.getId(), cart, discount.getRate(), cartEntity.calculateTotal());
+        var save = orderRepository.save(basicOrder);
         log.debug("The order has been persisted: ({}).", save);
+        return save;
     }
 
 
@@ -60,12 +53,6 @@ public class OrderService {
             .filter(Optional::isPresent)
             .map(Optional::get)
             .orElseThrow(() -> new NotFoundException(String.format("Order by user (%s) not found.", user)));
-    }
-
-
-    @Transactional(readOnly = true)
-    public Page<OrderEntity> loadAllUserOrder(Long user, Pageable pageable) {
-        return orderRepository.findAllByUserAndStatusIn(user, List.of(OrderEntity.Status.OPEN), pageable);
     }
 
     @Transactional(readOnly = true)
@@ -90,9 +77,15 @@ public class OrderService {
 
 
     public void deleteOrder(Long order) {
-
+        orderRepository
+            .findById(order)
+            .ifPresent(
+                entity -> {
+                    orderRepository.delete(entity);
+                    log.debug("Deleted Order: ({}).", entity);
+                }
+            );
     }
-
 
     private OrderRepository orderRepository;
     private DiscountService discountService;
