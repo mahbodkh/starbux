@@ -26,7 +26,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Created by Ebrahim Kh.
@@ -59,51 +58,7 @@ public class CartEntity implements Comparable<CartEntity> {
     @UpdateTimestamp
     private Date changed;
     @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @Where(clause = "DELETED=0")
-    private Set<PropertyItemEntity> productItems = new HashSet<>();
-
-
-//    @Transient
-//    private <T> T getPropertiesByType(Class<T> classType) {
-//        var props = Optional.ofNullable(getProperties()).orElseGet(HashMap::new);
-//        setProperties(props);
-//        return OBJECT_MAPPER.convertValue(props, classType);
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    @Transient
-//    private <T> void setPropertiesByType(T t) {
-//        var newMap = OBJECT_MAPPER.convertValue(t, Map.class);
-//        setProperties(newMap);
-//    }
-
-//    @Transient
-//    public ProductProperties getProductProperties() {
-//        return getPropertiesByType(ProductProperties.class);
-//    }
-//
-//    @Transient
-//    public void setProductProperties(ProductProperties emailProperties) {
-//        setPropertiesByType(emailProperties);
-//    }
-
-//    @NoArgsConstructor
-//    @AllArgsConstructor
-//    @Data
-//    @JsonIgnoreProperties(ignoreUnknown = true)
-//    @Builder
-//    public static class ProductProperties {
-//        private Long product;
-//        private Integer quantity = 1;
-//        private ProductEntity.Type type;
-//        private BigDecimal price = BigDecimal.ZERO;
-//        private BigDecimal total = BigDecimal.ZERO;
-//
-//        public BigDecimal getTotal() {
-//            return getPrice().multiply(BigDecimal.valueOf(quantity));
-//        }
-//    }
-
+    private Set<PropertyItemEntity> productItems = new HashSet<PropertyItemEntity>();
 
     @Builder(toBuilder = true)
     public CartEntity(Long id, Long user, Status status, Date created, Date changed, Set<PropertyItemEntity> productItems) {
@@ -169,40 +124,26 @@ public class CartEntity implements Comparable<CartEntity> {
             .orElse(BigDecimal.ZERO);
     }
 
+    @Transient
+    public BigDecimal calculateTotalSidePrice() {
+        return getProductItems().stream()
+            .filter(i -> ProductEntity.Type.SIDE.equals(i.getType()))
+            .map(PropertyItemEntity::getTotal)
+            .filter(Objects::nonNull)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
-//    public void prepareValues() {
-//        setTotalAmount(getCartItemPrices());
-//        if (ObjectUtils.isEmpty(discount)) {
-//            setAmount(totalAmount);
-//            setDiscountAmount(BigDecimal.ZERO);
-//        }
-//        calculateTotalDrinkProductNumber();
-//    }
-
-//    public int calculateTotalDrinkProductNumber() {
-//        int totalDrinkProductNumber = 0;
-//        for (CartItem cartItem : cartItems) {
-//            if (ObjectUtils.isEmpty(cartItem.getDrinkProduct())) {
-//                continue;
-//            }
-//            totalDrinkProductNumber += cartItem.getQuantity();
-//        }
-//        return totalDrinkProductNumber;
-//    }
-//
-//    public BigDecimal getCartItemPrices() {
-//        totalAmount = BigDecimal.ZERO;
-//        for (CartItem cartItem : cartItems) {
-//            cartItem.calculatePrice();
-//            totalAmount = totalAmount.add(cartItem.getPrice());
-//        }
-//        return totalAmount;
-//    }
-
+    @Transient
+    public BigDecimal calculateTotalMainPrice() {
+        return getProductItems().stream()
+            .filter(i -> ProductEntity.Type.MAIN.equals(i.getType()))
+            .map(PropertyItemEntity::getTotal)
+            .filter(Objects::nonNull)
+            .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
 
     public void addOrUpdateProductToCart(PropertyItemEntity property) {
         productItems.add(property);
     }
-
 
 }
