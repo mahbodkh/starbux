@@ -1,6 +1,7 @@
 package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.CartEntity;
+import app.bestseller.starbux.domain.ProductEntity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -57,7 +58,7 @@ public class DiscountService {
     }
 
     private BigDecimal getDiscountByLowestProduct(CartEntity cart) {
-        if (cart.countTotalSide() < DISCOUNT_BY_AMOUNT_LIMIT) {
+        if (cart.countTotalByType(ProductEntity.Type.SIDE) < DISCOUNT_BY_AMOUNT_LIMIT) {
             return BigDecimal.ZERO;
         }
         return cart.minItemPrice();

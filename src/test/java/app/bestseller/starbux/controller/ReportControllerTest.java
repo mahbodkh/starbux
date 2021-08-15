@@ -12,11 +12,16 @@ import app.bestseller.starbux.repository.UserRepository;
 import app.bestseller.starbux.service.DiscountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
@@ -24,6 +29,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
@@ -66,8 +72,19 @@ public class ReportControllerTest {
     }
 
 
+    @Test
+    @Transactional
+    void testGetReportTopSoldSide_whenValidInput_thenReturn() throws Exception {
 
-
+        mockMvc.perform(MockMvcRequestBuilders
+            .get("/v1/report/admin/product/top/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.product").exists())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.type").exists())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.count").exists());
+    }
 
 
     private OrderEntity buildOrderEntity() {

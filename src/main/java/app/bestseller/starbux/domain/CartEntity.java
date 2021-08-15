@@ -107,10 +107,12 @@ public class CartEntity implements Comparable<CartEntity> {
     }
 
     @Transient
-    public Integer countTotalSide() {
-        return (int) getProductItems().stream()
-            .filter(p -> p.getType().equals(ProductEntity.Type.SIDE))
-            .count();
+    public Integer countTotalByType(ProductEntity.Type type) {
+        return getProductItems().stream()
+            .filter(p -> p.getType().equals(type))
+            .map(PropertyItemEntity::getQuantity)
+            .map(BigDecimal::new)
+            .reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
     }
 
     @Transient

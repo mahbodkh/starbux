@@ -42,7 +42,7 @@ public class ReportServiceTest {
 
     @BeforeEach
     public void setup() {
-        user = userRepository.save(buildUserEntity());
+//        user = userRepository.save(buildUserEntity());
         productFirst = productRepository.save(buildProductEntityFirst());
         productSecond = productRepository.save(buildProductEntitySecond());
         cart = cartRepository.save(buildCartEntity());

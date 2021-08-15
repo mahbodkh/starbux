@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,11 +29,34 @@ public class ReportController {
     // ==============================================
     //                     ADMIN
     // ==============================================
-    @GetMapping("/product/top/")
-    public void loadMostSoldSideProduct() throws BadRequestException {
-
+    @GetMapping("/admin/product/top/")
+    public ResponseEntity<ReportTopSideProductReply> loadTopSoldSideProduct() throws BadRequestException {
+        var reply = reportService.loadTopSideProduct();
+        return ResponseEntity.ok(
+            new ReportTopSideProductReply(
+                reply.get("productId", Long.class),
+                reply.get("productType", String.class),
+                reply.get("productCount", Integer.class)
+            ));
     }
 
+    @GetMapping("/admin/")
+    public ResponseEntity<ReportReply> loadMostSoldSideProduct() throws BadRequestException {
+        var reply = reportService.loadTopSideProduct();
+        return ResponseEntity.ok(
+            new ReportReply()
+        );
+    }
+
+
+    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
+    @AllArgsConstructor
+    @Getter
+    public static class ReportTopSideProductReply {
+        private Long product;
+        private String type;
+        private Integer count;
+    }
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @AllArgsConstructor
