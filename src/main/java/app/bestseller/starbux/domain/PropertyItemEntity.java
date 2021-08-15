@@ -38,6 +38,8 @@ public class PropertyItemEntity {
     private BigDecimal price = BigDecimal.ZERO;
     @Column(name = "total")
     private BigDecimal total = BigDecimal.ZERO;
+    @Column(name = "cart_id")
+    private Long cart;
 
 
     public BigDecimal getTotal() {
@@ -56,27 +58,29 @@ public class PropertyItemEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, product, quantity);
+        return Objects.hash(id, product, quantity, cart);
     }
 
     @Builder(toBuilder = true)
-    public PropertyItemEntity(Long id, Long product, ProductEntity.Type type, Integer quantity, BigDecimal price, BigDecimal total) {
+    public PropertyItemEntity(Long id, Long product, ProductEntity.Type type, Integer quantity, BigDecimal price, BigDecimal total, Long cart) {
         setId(id);
         setProduct(product);
         setType(type);
         setQuantity(quantity);
+        setCart(cart);
         setPrice(price);
         setTotal(total);
 
     }
 
     @Transient
-    public static PropertyItemEntity getBasicProperty(Long product, Integer quantity, BigDecimal price, ProductEntity.Type type) {
+    public static PropertyItemEntity getBasicProperty(Long product, Integer quantity, BigDecimal price, ProductEntity.Type type, Long cart) {
         return PropertyItemEntity.builder()
             .product(product)
             .quantity(quantity)
             .price(price)
             .type(type)
+            .cart(cart)
             .total(price.multiply(BigDecimal.valueOf(quantity)))
             .build();
     }

@@ -36,7 +36,7 @@ public class CartServiceTest {
     ProductRepository productRepository;
 
     @BeforeEach
-    public void prepareCartTest() {
+    public void setup() {
         userFirst = userRepository.save(buildUserEntityFirst());
         userSecond = userRepository.save(buildUserEntitySecond());
         productFirst = productRepository.save(buildProductEntityFirst());

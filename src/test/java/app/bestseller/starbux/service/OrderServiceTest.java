@@ -43,7 +43,7 @@ public class OrderServiceTest {
     CartRepository cartRepository;
 
     @BeforeEach
-    public void prepareCartTest() {
+    public void setup() {
         user = userRepository.save(buildUserEntity());
         productFirst = productRepository.save(buildProductEntityFirst());
         productSecond = productRepository.save(buildProductEntitySecond());
