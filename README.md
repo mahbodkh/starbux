@@ -11,9 +11,9 @@
 * Swagger.
 * Dockerfile.
 * Deploy Heroku 
-* All services are decoupled design [SOLID]
-* All services are injected by maximum three class.
-* Ready for monitoring. [actuator, prometheus, influxDb]
+* All services are decoupled design [`SOLID`]
+* All services are injected with maximum capacity beans.
+* _Ready for monitoring. [actuator, prometheus, influxDb]_
 
 ### Start:
 
@@ -23,10 +23,11 @@ Run:
 `$ mvn spring-boot:run`
 
 url: `http://localhost` Port: `8008`
+Heroku: `https://bestseller-starbux-stage.herokuapp.com`
 
-####Swagger:
+###Swagger:
 Address: 
-`http://localhost:8008/swagger-ui.html`
+`https://bestseller-starbux-stage.herokuapp.com/swagger-ui.html`
 
 ### Docker:
 
