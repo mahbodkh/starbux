@@ -13,12 +13,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -49,6 +47,7 @@ public class OrderServiceTest {
         productFirst = productRepository.save(buildProductEntityFirst());
         productSecond = productRepository.save(buildProductEntitySecond());
         cart = cartRepository.save(buildCartEntity());
+        discount = discountService.applyPromotion(cart);
     }
 
 
@@ -63,13 +62,52 @@ public class OrderServiceTest {
         assertEquals(order.getUser(), save.getUser());
         assertEquals(order.getCart(), save.getCart());
         assertEquals(cart.calculateTotal(), save.getTotal());
-        assertEquals(discountService.applyPromotion(cart).getRate(), save.getDiscount());
-        assertEquals(cart.calculateTotal().subtract(discountService.applyPromotion(cart).getRate()), save.getPrice());
+        assertEquals(discount.getRate(), save.getDiscount());
+        assertEquals(cart.calculateTotal().subtract(discount.getRate()), save.getPrice());
+    }
+
+    @Test
+    @Transactional
+    public void testLoadOrder() throws Exception {
+        var save = orderRepository.save(buildOrderEntity());
+        var order = orderService.loadOrder(save.getId());
+
+        assertEquals(save.getId(), order.getId());
+        assertEquals(save.getUser(), order.getUser());
+        assertEquals(save.getCart(), order.getCart());
+        assertEquals(save.getTotal(), order.getTotal());
+        assertEquals(save.getDiscount(), order.getDiscount());
+        assertEquals(save.getPrice(), order.getPrice());
+    }
+
+    @Test
+    @Transactional
+    public void testLoadOrderByUser() throws Exception {
+        var save = orderRepository.save(buildOrderEntity());
+        var order = orderService.loadCurrentOrderByUser(save.getUser());
+
+        assertEquals(save.getId(), order.getId());
+        assertEquals(save.getUser(), order.getUser());
+        assertEquals(save.getCart(), order.getCart());
+        assertEquals(save.getTotal(), order.getTotal());
+        assertEquals(save.getDiscount(), order.getDiscount());
+        assertEquals(save.getPrice(), order.getPrice());
     }
 
 
 
 
+
+    private OrderEntity buildOrderEntity() {
+        var order = new OrderEntity();
+        order.setStatus(OrderEntity.Status.OPEN);
+        order.setUser(user.getId());
+        order.setCart(cart.getId());
+        order.setTotal(cart.calculateTotal());
+        order.setPrice(order.getTotal().subtract(discount.getRate()));
+        order.setDiscount(discount.getRate());
+        return order;
+    }
 
     private CartEntity buildCartEntity() {
         var cart = new CartEntity();
@@ -132,4 +170,5 @@ public class OrderServiceTest {
     private ProductEntity productFirst;
     private ProductEntity productSecond;
     private CartEntity cart;
+    private DiscountService.DiscountEntity discount;
 }
