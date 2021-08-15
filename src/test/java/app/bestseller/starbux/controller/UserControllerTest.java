@@ -39,10 +39,6 @@ public class UserControllerTest {
     private final ObjectMapper
         objectMapper = new ObjectMapper();
 
-//    @Autowired
-//    private UserController userController;
-//    @Autowired
-//    private UserService userService;
     @Autowired
     private UserRepository userRepository;
 
