@@ -9,8 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.math.BigDecimal;
@@ -40,12 +38,6 @@ public class PropertyItemEntity {
     private BigDecimal price = BigDecimal.ZERO;
     @Column(name = "total")
     private BigDecimal total = BigDecimal.ZERO;
-//    @ManyToOne
-//    @JoinColumn(name = "cart_id")
-//    private CartEntity cart;
-
-//    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-//    private Set<Long> sideProducts = new HashSet<>();
 
 
     public BigDecimal getTotal() {
@@ -75,7 +67,7 @@ public class PropertyItemEntity {
         setQuantity(quantity);
         setPrice(price);
         setTotal(total);
-//        setCart(cart);
+
     }
 
     @Transient
@@ -85,7 +77,6 @@ public class PropertyItemEntity {
             .quantity(quantity)
             .price(price)
             .type(type)
-//            .cart(cart)
             .total(price.multiply(BigDecimal.valueOf(quantity)))
             .build();
     }
