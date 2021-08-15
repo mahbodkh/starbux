@@ -21,10 +21,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 public class UserServiceTest {
 
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private UserRepository userRepository;
+    private @Autowired
+    UserService userService;
+    private @Autowired
+    UserRepository userRepository;
 
     @Test
     @Transactional

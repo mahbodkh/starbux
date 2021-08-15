@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
@@ -51,12 +50,10 @@ public class ReportServiceTest {
     }
 
 
-
     @Test
     public void testLoadTransaction() throws Exception {
         var productEntity = reportService.loadTopSideProduct();
     }
-
 
 
     private OrderEntity buildOrderEntity() {
