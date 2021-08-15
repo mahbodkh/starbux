@@ -76,13 +76,13 @@ public class ProductControllerTest {
     void testGetAllProducts_whenValidInput_thenReturnsAndExpectResponses() throws Exception {
         var saveFirst = productRepository.save(buildProductEntityFirst());
         var saveSecond
-            = productRepository.save(buildProductEntityFirst());
+            = productRepository.save(buildProductEntitySecond());
 
         mockMvc.perform(MockMvcRequestBuilders
             .get("/v1/product/all/")
             .contentType(MediaType.APPLICATION_JSON)
-            .param("size","20")
-            .param("page","1")
+            .param("size", "20")
+            .param("page", "1")
             .accept(MediaType.APPLICATION_JSON))
             .andDo(print())
             .andExpect(status().isOk())
@@ -112,6 +112,7 @@ public class ProductControllerTest {
 
 
     @Test
+    @Transactional
     void testPostCreateProduct_whenValidInput_thenReturnsAndExpectResponse() throws Exception {
         var productEntity = buildProductEntityFirst();
 
@@ -128,6 +129,35 @@ public class ProductControllerTest {
             .content(objectMapper.writeValueAsString(productRequest))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated());
+    }
+
+    @Test
+    @Transactional
+    void testPutEditProduct_whenValidInput_thenReturns() throws Exception {
+        var save = productRepository.save(buildProductEntityFirst());
+
+        var editRequest = new ProductController.ProductRequest();
+        ReflectionTestUtils.setField(editRequest, "name", "name_edited");
+        ReflectionTestUtils.setField(editRequest, "description", "description_edited");
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/v1/product/admin/" + save.getId() + "/edit/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(editRequest))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
+    void testDeleteProduct_whenValidInput_thenReturns() throws Exception {
+        var save = productRepository.save(buildProductEntityFirst());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .delete("/v1/product/admin/" + save.getId() + "/delete/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
     }
 
 
