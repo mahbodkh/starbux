@@ -23,11 +23,14 @@ Run:
 `$ mvn spring-boot:run`
 
 url: `http://localhost` Port: `8008`
+
 Heroku: `https://bestseller-starbux-stage.herokuapp.com`
 
-###Swagger:
+
+#### Swagger:
 Address: 
 `https://bestseller-starbux-stage.herokuapp.com/swagger-ui.html`
+
 
 ### Docker:
 
@@ -64,7 +67,6 @@ Address:
 |               |                                         |                               |
 | GET           | /v1/report/admin/product/top/           | Report by top side product         |
 | GET           | /v1/report/admin/                       | Load all the currencies       |
-|               |                                         |                               |
 |               |                                         |                               |
 
 
