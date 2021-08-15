@@ -39,10 +39,10 @@ public class UserControllerTest {
     private final ObjectMapper
         objectMapper = new ObjectMapper();
 
-    @Autowired
-    private UserController userController;
-    @Autowired
-    private UserService userService;
+//    @Autowired
+//    private UserController userController;
+//    @Autowired
+//    private UserService userService;
     @Autowired
     private UserRepository userRepository;
 
@@ -143,6 +143,78 @@ public class UserControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.content.[1]authorities").isArray());
     }
 
+
+    @Test
+    @Transactional
+    void testPutEditUser_whenValidInput_thenReturns() throws Exception {
+        var save = userRepository.save(buildUserEntityFirst());
+
+        var editRequest = new UserController.CreateRequest();
+        ReflectionTestUtils.setField(editRequest, "username", "username");
+        ReflectionTestUtils.setField(editRequest, "name", "name");
+        ReflectionTestUtils.setField(editRequest, "family", "family");
+        ReflectionTestUtils.setField(editRequest, "email", "test@email.com");
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/v1/user/admin/" + save.getId() + "/edit/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(editRequest))
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
+    void testPutSafeDeleteUser_whenValidInput_thenReturns() throws Exception {
+        var save = userRepository.save(buildUserEntityFirst());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/v1/user/admin/" + save.getId() + "/delete/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
+    void testDeleteUser_whenValidInput_thenReturns() throws Exception {
+        var save = userRepository.save(buildUserEntityFirst());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .delete("/v1/user/admin/" + save.getId() + "/delete/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
+    void testBanUser_whenValidInput_thenReturns() throws Exception {
+        var save = userRepository.save(buildUserEntityFirst());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/v1/user/admin/" + save.getId() + "/ban/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @Transactional
+    void testFrozenUser_whenValidInput_thenReturns() throws Exception {
+        var save = userRepository.save(buildUserEntityFirst());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .put("/v1/user/admin/" + save.getId() + "/frozen/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andDo(print())
+            .andExpect(status().isOk());
+    }
 
 
     private UserEntity buildUserEntityFirst() {
