@@ -87,6 +87,7 @@ public class OrderControllerTest {
             .andExpect(status().isCreated());
     }
 
+
     @Test
     @Transactional
     void testGetOrder_whenValidInput_thenReturnAndExpectedResponse() throws Exception {
@@ -110,6 +111,21 @@ public class OrderControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.price")
                 .value(cart.calculateTotal().subtract(discount.getRate()).doubleValue()));
     }
+
+
+    @Test
+    @Transactional
+    void testDeleteOrder_whenValidInput_thenReturn() throws Exception {
+        var save = orderRepository.save(buildOrderEntity());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .delete("/v1/order/admin/" + user.getId() + "/delete/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk());
+    }
+
+
 
     private OrderEntity buildOrderEntity() {
         var order = new OrderEntity();
