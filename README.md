@@ -12,7 +12,7 @@
 * Dockerfile.
 * Deploy Heroku 
 * All services are decoupled design [SOLID]
-* All services are injected by maximumes three class.
+* All services are injected by maximum three class.
 * Ready for monitoring. [actuator, prometheus, influxDb]
 
 ### Start:
