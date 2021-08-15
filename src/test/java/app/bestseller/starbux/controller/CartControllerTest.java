@@ -43,12 +43,12 @@ public class CartControllerTest {
     private final ObjectMapper
         objectMapper = new ObjectMapper();
 
-    @Autowired
-    private CartRepository cartRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private ProductRepository productRepository;
+    private @Autowired
+    CartRepository cartRepository;
+    private @Autowired
+    UserRepository userRepository;
+    private @Autowired
+    ProductRepository productRepository;
 
     @BeforeEach
     public void setUp() {

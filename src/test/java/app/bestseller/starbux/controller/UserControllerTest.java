@@ -38,8 +38,8 @@ public class UserControllerTest {
     private final ObjectMapper
         objectMapper = new ObjectMapper();
 
-    @Autowired
-    private UserRepository userRepository;
+    private @Autowired
+    UserRepository userRepository;
 
     @BeforeEach
     public void setUp() {

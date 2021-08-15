@@ -39,8 +39,8 @@ public class ProductControllerTest {
     private final ObjectMapper
         objectMapper = new ObjectMapper();
 
-    @Autowired
-    private ProductRepository productRepository;
+    private @Autowired
+    ProductRepository productRepository;
 
     @BeforeEach
     public void setUp() {
