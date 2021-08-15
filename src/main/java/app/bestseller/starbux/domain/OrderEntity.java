@@ -92,7 +92,7 @@ public class OrderEntity {
         return OrderEntity.builder()
             .user(user)
             .cart(cart)
-            .discount(discount.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : discount )
+            .discount(discount.equals(BigDecimal.ZERO) ? BigDecimal.ZERO : discount)
             .total(total)
             .price(total.subtract(discount))
             .status(Status.OPEN)

@@ -112,7 +112,8 @@ public class CartEntity implements Comparable<CartEntity> {
             .filter(p -> p.getType().equals(type))
             .map(PropertyItemEntity::getQuantity)
             .map(BigDecimal::new)
-            .reduce(BigDecimal.ZERO, BigDecimal::add).intValue();
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .intValue();
     }
 
     @Transient

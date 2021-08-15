@@ -97,7 +97,7 @@ public class ProductEntity {
     }
 
     @Transient
-    public static ProductEntity getBasicProduct(String name, String description, BigDecimal price,Status status, Type type) {
+    public static ProductEntity getBasicProduct(String name, String description, BigDecimal price, Status status, Type type) {
         return ProductEntity.builder()
             .name(name)
             .description(description)
