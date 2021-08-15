@@ -1,6 +1,7 @@
 package app.bestseller.starbux.controller;
 
 import app.bestseller.starbux.domain.CartEntity;
+import app.bestseller.starbux.domain.OrderEntity;
 import app.bestseller.starbux.domain.ProductEntity;
 import app.bestseller.starbux.domain.PropertyItemEntity;
 import app.bestseller.starbux.domain.UserEntity;
@@ -20,10 +21,12 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -82,6 +85,41 @@ public class OrderControllerTest {
             .content(objectMapper.writeValueAsString(orderRequest))
             .accept(MediaType.APPLICATION_JSON))
             .andExpect(status().isCreated());
+    }
+
+    @Test
+    @Transactional
+    void testGetOrder_whenValidInput_thenReturnAndExpectedResponse() throws Exception {
+        var save = orderRepository.save(buildOrderEntity());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .get("/v1/order/" + user.getId() + "/user/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(save.getId()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.user").value(save.getUser()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.cart").value(save.getCart()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.created").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.changed").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(save.getStatus().name()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.discount")
+                .value(discount.getRate().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.total")
+                .value(cart.calculateTotal().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.price")
+                .value(cart.calculateTotal().subtract(discount.getRate()).doubleValue()));
+    }
+
+    private OrderEntity buildOrderEntity() {
+        var order = new OrderEntity();
+        order.setStatus(OrderEntity.Status.OPEN);
+        order.setUser(user.getId());
+        order.setCart(cart.getId());
+        order.setTotal(cart.calculateTotal());
+        order.setPrice(order.getTotal().subtract(discount.getRate()));
+        order.setDiscount(discount.getRate());
+        return order;
     }
 
 

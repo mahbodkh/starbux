@@ -46,8 +46,8 @@ public class OrderController {
                 order.getUser(),
                 order.getCart(),
                 order.getPrice().doubleValue(),
-                order.getDiscount().doubleValue(),
                 order.getTotal().doubleValue(),
+                order.getDiscount().doubleValue(),
                 order.getStatus().name(),
                 order.getCreated(),
                 order.getChanged()
@@ -86,7 +86,7 @@ public class OrderController {
     public static class OrderReply {
         private Long id;
         private Long user;
-        private Long card;
+        private Long cart;
         private Double price;
         private Double total;
         private Double discount;
