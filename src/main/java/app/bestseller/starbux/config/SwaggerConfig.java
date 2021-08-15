@@ -20,7 +20,7 @@ public class SwaggerConfig {
                 .apiInfo(metaData());
     }
     private ApiInfo metaData() {
-        ApiInfo apiInfo = new ApiInfo(
+        return new ApiInfo(
                 "BESTSELLER STARBUX",
                 "STARBUX REST API.",
                 "1.0",
@@ -28,6 +28,5 @@ public class SwaggerConfig {
                 "Ebrahim Khosravani",
                 "Apache License Version 2.0",
                 "https://www.apache.org/licenses/LICENSE-2.0");
-        return apiInfo;
     }
 }
