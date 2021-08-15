@@ -18,11 +18,11 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -80,24 +80,84 @@ public class CartControllerTest {
     @Test
     @Transactional
     void testGetCart_whenValidInput_thenReturnAndExpectedResponses() throws Exception {
-//        "/v1/cart/{id}/"
+        var entityFirst = new PropertyItemEntity();
+        entityFirst.setProduct(productFirst.getId());
+        entityFirst.setQuantity(4);
+        entityFirst.setType(productFirst.getType());
+        entityFirst.setPrice(productFirst.getPrice());
 
+        var entitySecond = new PropertyItemEntity();
+        entitySecond.setProduct(productSecond.getId());
+        entitySecond.setQuantity(2);
+        entitySecond.setType(productSecond.getType());
+        entitySecond.setPrice(productSecond.getPrice());
 
+        var save = cartRepository.save(buildCartEntity(Set.of(entityFirst, entitySecond)));
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .get("/v1/cart/" + save.getId() + "/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(save.getId()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.user").value(save.getUser()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.created").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.changed").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(save.getStatus().name()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isArray())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isNotEmpty())
+
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]product").value(entityFirst.getProduct()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]quantity").value(entityFirst.getQuantity()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]price").value(entityFirst.getPrice().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]type").value(entityFirst.getType().name()))
+
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]product").value(entitySecond.getProduct()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]quantity").value(entitySecond.getQuantity()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]price").value(entitySecond.getPrice().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]type").value(entitySecond.getType().name()));
     }
 
     @Test
     @Transactional
     void testGetCartByUser_whenValidInput_thenReturn() throws Exception {
-//        "/v1/cart/admin/{id}/user/"
+        var entityFirst = new PropertyItemEntity();
+        entityFirst.setProduct(productFirst.getId());
+        entityFirst.setQuantity(4);
+        entityFirst.setType(productFirst.getType());
+        entityFirst.setPrice(productFirst.getPrice());
 
+        var save = cartRepository.save(buildCartEntity(Set.of(entityFirst)));
 
+        mockMvc.perform(MockMvcRequestBuilders
+            .get("/v1/cart/admin/" + userFirst.getId() + "/user/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(save.getId()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.user").value(save.getUser()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.created").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.changed").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(save.getStatus().name()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isArray())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isNotEmpty())
+
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]product").value(entityFirst.getProduct()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]quantity").value(entityFirst.getQuantity()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]price").value(entityFirst.getPrice().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]type").value(entityFirst.getType().name()));
     }
 
     @Test
     @Transactional
     void testDeleteCart_whenValidInput_thenReturn() throws Exception {
+        var entityFirst = new PropertyItemEntity();
+        entityFirst.setProduct(productFirst.getId());
+        entityFirst.setQuantity(4);
+        entityFirst.setType(productFirst.getType());
+        entityFirst.setPrice(productFirst.getPrice());
 
-        var save = cartRepository.save(buildCartEntity());
+        var save = cartRepository.save(buildCartEntity(Set.of(entityFirst)));
 
         mockMvc.perform(MockMvcRequestBuilders
             .delete("/v1/product/admin/" + save.getId() + "/delete/")
@@ -106,32 +166,12 @@ public class CartControllerTest {
             .andExpect(status().isOk());
     }
 
-    private CartEntity buildCartEntity() {
+    private CartEntity buildCartEntity(Set<PropertyItemEntity> items) {
         var cart = new CartEntity();
-        cart.setId(100L);
         cart.setStatus(CartEntity.Status.OPEN);
-        cart.setUser(buildUserEntityFirst().getId());
-        cart.setProductItems(buildProductItemEntity());
+        cart.setUser(userFirst.getId());
+        cart.setProductItems(items);
         return cart;
-    }
-
-    private Set<PropertyItemEntity> buildProductItemEntity() {
-        var productDetails = new HashSet<PropertyItemEntity>();
-        var entityFirst = new PropertyItemEntity();
-        entityFirst.setProduct(buildUserEntityFirst().getId());
-        entityFirst.setQuantity(4);
-        entityFirst.setType(buildProductEntityFirst().getType());
-        entityFirst.setPrice(buildProductEntityFirst().getPrice());
-        productDetails.add(entityFirst);
-
-        var entitySecond = new PropertyItemEntity();
-        entitySecond.setProduct(buildUserEntitySecond().getId());
-        entitySecond.setQuantity(2);
-        entitySecond.setType(buildProductEntitySecond().getType());
-        entitySecond.setPrice(buildProductEntitySecond().getPrice());
-        productDetails.add(entitySecond);
-
-        return productDetails;
     }
 
 

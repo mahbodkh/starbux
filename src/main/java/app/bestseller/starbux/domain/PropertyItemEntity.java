@@ -40,9 +40,9 @@ public class PropertyItemEntity {
     private BigDecimal price = BigDecimal.ZERO;
     @Column(name = "total")
     private BigDecimal total = BigDecimal.ZERO;
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private CartEntity cart;
+//    @ManyToOne
+//    @JoinColumn(name = "cart_id")
+//    private CartEntity cart;
 
 //    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 //    private Set<Long> sideProducts = new HashSet<>();
@@ -68,24 +68,24 @@ public class PropertyItemEntity {
     }
 
     @Builder(toBuilder = true)
-    public PropertyItemEntity(Long id, Long product, ProductEntity.Type type, Integer quantity, BigDecimal price, BigDecimal total, CartEntity cart) {
+    public PropertyItemEntity(Long id, Long product, ProductEntity.Type type, Integer quantity, BigDecimal price, BigDecimal total) {
         setId(id);
         setProduct(product);
         setType(type);
         setQuantity(quantity);
         setPrice(price);
         setTotal(total);
-        setCart(cart);
+//        setCart(cart);
     }
 
     @Transient
-    public static PropertyItemEntity getBasicProperty(Long product, Integer quantity, BigDecimal price, ProductEntity.Type type, CartEntity cart) {
+    public static PropertyItemEntity getBasicProperty(Long product, Integer quantity, BigDecimal price, ProductEntity.Type type) {
         return PropertyItemEntity.builder()
             .product(product)
             .quantity(quantity)
             .price(price)
             .type(type)
-            .cart(cart)
+//            .cart(cart)
             .total(price.multiply(BigDecimal.valueOf(quantity)))
             .build();
     }

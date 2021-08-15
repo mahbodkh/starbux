@@ -47,7 +47,7 @@ public class CartService {
             productItemsMap.put(product.getId(), item);
         }
         var item = PropertyItemEntity
-            .getBasicProperty(product.getId(), quantity, product.getPrice(), product.getType(), cartEntity);
+            .getBasicProperty(product.getId(), quantity, product.getPrice(), product.getType());
         productItemsMap.put(product.getId(), item);
 
         cartEntity.setProductItems(new HashSet<>(productItemsMap.values()));

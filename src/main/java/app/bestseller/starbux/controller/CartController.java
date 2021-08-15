@@ -49,10 +49,9 @@ public class CartController {
 
     @GetMapping("/{id}/")
     public ResponseEntity<CartReply> getCurrentCart(@PathVariable("id") Long cart) {
-        var user = cartService.loadCart(cart);
-        if (ObjectUtils.isEmpty(user))
-            throw new NotFoundException("Your account has not found.");
-        var reply = cartService.loadCartsByUser(user.getId());
+        var reply = cartService.loadCart(cart);
+        if (ObjectUtils.isEmpty(cart))
+            throw new NotFoundException("Your cart not found.");
         var orderProductReplies = new ArrayList<OrderProductReply>();
         reply.getProductItems().forEach(p ->
             orderProductReplies.add(new OrderProductReply(
