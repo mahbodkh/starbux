@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Created by Ebrahim Kh.
@@ -95,7 +96,16 @@ public class OrderServiceTest {
     }
 
 
+    @Test
+    @Transactional
+    public void testDeleteOrder() throws Exception {
+        var order = orderRepository.save(buildOrderEntity());
 
+        orderService.deleteOrder(order.getId());
+
+        var orderDelete = orderRepository.existsById(order.getId());
+        assertFalse(orderDelete);
+    }
 
 
     private OrderEntity buildOrderEntity() {
