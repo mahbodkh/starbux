@@ -1,6 +1,5 @@
 package app.bestseller.starbux.controller;
 
-import app.bestseller.starbux.controller.validator.UserUtils;
 import app.bestseller.starbux.exception.BadRequestException;
 import app.bestseller.starbux.exception.NotFoundException;
 import app.bestseller.starbux.service.CartService;
@@ -24,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -37,22 +35,21 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/v1/cart", produces = "application/json")
 public class CartController {
-
     // ==============================================
     //                     CLIENT
     // ==============================================
-    @PostMapping("/create/")
-    @ResponseStatus(HttpStatus.OK)
-    public void createCart(@Valid @RequestBody CartController.CartRequest request) throws BadRequestException {
-        var user = userService.loadByUsername(UserUtils.getAuthenticatedUsername());
-        if (ObjectUtils.isEmpty(user))
+    @PostMapping("/create/{id}/user/")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createCart(@PathVariable("id") Long user, @Valid @RequestBody CartController.CartRequest request) throws BadRequestException {
+        var userEntity = userService.loadUser(user);
+        if (ObjectUtils.isEmpty(userEntity))
             throw new NotFoundException("Your account has not found.");
-        cartService.createOrUpdateCart(user, request.getProduct(), request.getQuantity());
+        cartService.createOrUpdateCart(userEntity, request.getProduct(), request.getQuantity());
     }
 
-    @GetMapping("/")
-    public ResponseEntity<CartReply> getCurrentCart() {
-        var user = userService.loadByUsername(UserUtils.getAuthenticatedUsername());
+    @GetMapping("/{id}/")
+    public ResponseEntity<CartReply> getCurrentCart(@PathVariable("id") Long cart) {
+        var user = cartService.loadCart(cart);
         if (ObjectUtils.isEmpty(user))
             throw new NotFoundException("Your account has not found.");
         var reply = cartService.loadCartsByUser(user.getId());
@@ -76,15 +73,9 @@ public class CartController {
     // ==============================================
     //                     ADMIN
     // ==============================================
-    @DeleteMapping("/admin/{id}/delete/")
-    @ResponseStatus(HttpStatus.OK)
-    public void deleteCart(@PathVariable("id") Long cart) {
-        cartService.deleteCart(cart);
-    }
-
-    @GetMapping("/{id}/")
-    public ResponseEntity<CartReply> getCart(@PathVariable("id") Long cart) {
-        var reply = cartService.loadCart(cart);
+    @GetMapping("/admin/{id}/user/")
+    public ResponseEntity<CartReply> getCart(@PathVariable("id") Long user) {
+        var reply = cartService.loadCartsByUser(user);
         var orderProductReplies = new ArrayList<OrderProductReply>();
         reply.getProductItems().forEach(p ->
             orderProductReplies.add(new OrderProductReply(
@@ -102,6 +93,12 @@ public class CartController {
             ));
     }
 
+    @DeleteMapping("/admin/{id}/delete/")
+    @ResponseStatus(HttpStatus.OK)
+    public void deleteCart(@PathVariable("id") Long cart) {
+        cartService.deleteCart(cart);
+    }
+
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @Getter
@@ -116,7 +113,7 @@ public class CartController {
     public static class CartReply {
         private Long id;
         private Long user;
-        private List<OrderProductReply> orderProducts = Collections.emptyList();
+        private List<OrderProductReply> orderProducts;
         private String status;
         private Date created;
         private Date changed;
