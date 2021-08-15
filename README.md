@@ -27,10 +27,6 @@ url: `http://localhost` Port: `8008`
 Heroku: `https://bestseller-starbux-stage.herokuapp.com`
 
 
-#### Swagger:
-Address: 
-`https://bestseller-starbux-stage.herokuapp.com/swagger-ui.html`
-
 
 ### Docker:
 
@@ -38,7 +34,13 @@ Address:
 `docker-compose -f docker-compose.yml up -d`
 
 
-### APIs doc:
+## DOC:
+
+#### Swagger:
+Address:
+`https://bestseller-starbux-stage.herokuapp.com/swagger-ui.html`
+
+#### Scheme APIs:
 
 | Http Method   | Path                                    | Description                 |
 |-------------	|---------------------------------------- |---------------------------	|
