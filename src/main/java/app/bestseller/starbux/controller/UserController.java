@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/v1/user", produces = "application/json")
 public class UserController {
-        // ==============================================
+    // ==============================================
     //                     CLIENT
     // ==============================================
     @GetMapping("/{id}/")
@@ -102,7 +102,7 @@ public class UserController {
             request.getFamily(),
             ObjectUtils.isEmpty(request.getStatus()) ? null : UserEntity.Status.valueOf(request.getStatus()),
             ObjectUtils.isEmpty(request.getAuthorities()) ? null :
-            request.getAuthorities().stream().map(UserEntity.Authority::valueOf).collect(Collectors.toSet()),
+                request.getAuthorities().stream().map(UserEntity.Authority::valueOf).collect(Collectors.toSet()),
             Boolean.TRUE
         );
     }
