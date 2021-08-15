@@ -26,10 +26,8 @@ public class OrderService {
 
     @Transactional
     public OrderEntity createOrder(UserEntity user, Long cart) {
-        getOrderByUser(user.getId())
-            .ifPresent(entity ->
-                changeStatusOrder(entity.getId(), OrderEntity.Status.CANCEL)
-            );
+        var oldOrder = getOrderByUser(user.getId());
+        oldOrder.ifPresent(orderEntity -> changeStatusOrder(orderEntity.getId(), OrderEntity.Status.CANCEL));
         var cartEntity = cartService.loadCart(cart);
         var discount = discountService.applyPromotion(cartEntity);
         var basicOrder = OrderEntity.getBasicOrder(user.getId(), cart, discount.getRate(), cartEntity.calculateTotal());
@@ -87,7 +85,7 @@ public class OrderService {
             );
     }
 
-    private OrderRepository orderRepository;
-    private DiscountService discountService;
-    private CartService cartService;
+    private final OrderRepository orderRepository;
+    private final DiscountService discountService;
+    private final CartService cartService;
 }

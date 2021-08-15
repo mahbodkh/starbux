@@ -34,7 +34,6 @@ import java.util.Date;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/v1/order", produces = "application/json")
 public class OrderController {
-
     // ==============================================
     //                     CLIENT
     // ==============================================
