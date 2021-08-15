@@ -8,19 +8,27 @@ import app.bestseller.starbux.repository.CartRepository;
 import app.bestseller.starbux.repository.OrderRepository;
 import app.bestseller.starbux.repository.ProductRepository;
 import app.bestseller.starbux.repository.UserRepository;
+import app.bestseller.starbux.service.DiscountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
@@ -37,39 +45,73 @@ public class OrderControllerTest {
     private final ObjectMapper
         objectMapper = new ObjectMapper();
 
-    @Autowired
-    private ProductRepository productRepository;
-    @Autowired
-    private CartRepository cartRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private OrderRepository orderRepository;
+    private @Autowired
+    ProductRepository productRepository;
+    private @Autowired
+    CartRepository cartRepository;
+    private @Autowired
+    UserRepository userRepository;
+    private @Autowired
+    OrderRepository orderRepository;
+    private @Autowired
+    DiscountService discountService;
 
     @BeforeEach
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext)
             .alwaysDo(print())
             .build();
+
+        user = userRepository.save(buildUserEntityFirst());
+        productFirst = productRepository.save(buildProductEntityFirst());
+        productSecond = productRepository.save(buildProductEntitySecond());
+        cart = cartRepository.save(buildCartEntity());
+        discount = discountService.applyPromotion(cart);
     }
 
 
+    @Test
+    @Transactional
+    void testPostCreateOrder_whenValidInput_thenReturn() throws Exception {
+        var orderRequest = new OrderController.OrderRequest();
+        ReflectionTestUtils.setField(orderRequest, "cart", cart.getId());
+
+        mockMvc.perform(MockMvcRequestBuilders
+            .post("/v1/order/create/" + user.getId() + "/user/")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(orderRequest))
+            .accept(MediaType.APPLICATION_JSON))
+            .andExpect(status().isCreated());
+    }
 
 
-
-
-
-
-
-
-    private CartEntity buildCartEntity(Set<PropertyItemEntity> items) {
+    private CartEntity buildCartEntity() {
         var cart = new CartEntity();
         cart.setStatus(CartEntity.Status.OPEN);
-        cart.setUser(userFirst.getId());
-        cart.setProductItems(items);
+        cart.setUser(user.getId());
+        cart.setProductItems(buildProductItemEntity());
         return cart;
     }
 
+
+    private Set<PropertyItemEntity> buildProductItemEntity() {
+        var productDetails = new HashSet<PropertyItemEntity>();
+        var entityFirst = new PropertyItemEntity();
+        entityFirst.setProduct(productFirst.getId());
+        entityFirst.setQuantity(4);
+        entityFirst.setType(productFirst.getType());
+        entityFirst.setPrice(productFirst.getPrice());
+        productDetails.add(entityFirst);
+
+        var entitySecond = new PropertyItemEntity();
+        entitySecond.setProduct(productSecond.getId());
+        entitySecond.setQuantity(2);
+        entitySecond.setType(productSecond.getType());
+        entitySecond.setPrice(productSecond.getPrice());
+        productDetails.add(entitySecond);
+
+        return productDetails;
+    }
 
     private ProductEntity buildProductEntityFirst() {
         var product = new ProductEntity();
@@ -113,8 +155,9 @@ public class OrderControllerTest {
         return user;
     }
 
-    private UserEntity userFirst;
-    private UserEntity userSecond;
+    private UserEntity user;
     private ProductEntity productFirst;
     private ProductEntity productSecond;
+    private CartEntity cart;
+    private DiscountService.DiscountEntity discount;
 }

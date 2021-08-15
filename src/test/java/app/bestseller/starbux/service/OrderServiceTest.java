@@ -55,8 +55,8 @@ public class OrderServiceTest {
     @Test
     @Transactional
     public void testCreateOrder() throws Exception {
-
         var order = orderService.createOrder(user, cart.getId());
+
         var save = orderRepository.findById(order.getId()).get();
 
         assertEquals(order.getId(), save.getId());
@@ -71,6 +71,7 @@ public class OrderServiceTest {
     @Transactional
     public void testLoadOrder() throws Exception {
         var save = orderRepository.save(buildOrderEntity());
+
         var order = orderService.loadOrder(save.getId());
 
         assertEquals(save.getId(), order.getId());
@@ -85,6 +86,7 @@ public class OrderServiceTest {
     @Transactional
     public void testLoadOrderByUser() throws Exception {
         var save = orderRepository.save(buildOrderEntity());
+
         var order = orderService.loadCurrentOrderByUser(save.getUser());
 
         assertEquals(save.getId(), order.getId());

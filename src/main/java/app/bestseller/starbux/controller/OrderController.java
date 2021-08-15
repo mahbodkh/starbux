@@ -1,8 +1,6 @@
 package app.bestseller.starbux.controller;
 
-import app.bestseller.starbux.controller.validator.UserUtils;
 import app.bestseller.starbux.exception.NotFoundException;
-import app.bestseller.starbux.service.DiscountService;
 import app.bestseller.starbux.service.OrderService;
 import app.bestseller.starbux.service.UserService;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -17,7 +15,6 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -37,13 +34,13 @@ public class OrderController {
     // ==============================================
     //                     CLIENT
     // ==============================================
-    @GetMapping("/")
+    @GetMapping("/{id}/user/")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<OrderReply> getOrder(OrderRequest request) {
-        var user = userService.loadByUsername(UserUtils.getAuthenticatedUsername());
+    public ResponseEntity<OrderReply> getOrder(@PathVariable("id") Long user) {
+        var userEntity = userService.loadUser(user);
         if (ObjectUtils.isEmpty(user))
             throw new NotFoundException("Your account has not found.");
-        var order = orderService.loadCurrentOrderByUser(user.getId());
+        var order = orderService.loadCurrentOrderByUser(userEntity.getId());
         return ResponseEntity.ok(
             new OrderReply(order.getId(),
                 order.getUser(),
@@ -57,19 +54,13 @@ public class OrderController {
             ));
     }
 
-    @PostMapping("/create/")
-    @ResponseStatus(HttpStatus.OK)
-    public void createOrder(OrderRequest request) {
-        var user = userService.loadByUsername(UserUtils.getAuthenticatedUsername());
+    @PostMapping("/create/{id}/user/")
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createOrder(@PathVariable("id") Long user, @Valid @RequestBody OrderRequest request) {
+        var userEntity = userService.loadUser(user);
         if (ObjectUtils.isEmpty(user))
             throw new NotFoundException("Your account has not found.");
-        orderService.createOrder(user, request.getCart());
-    }
-
-    @PutMapping("/{id}/edit/")
-    @ResponseStatus(HttpStatus.OK)
-    public void editOrder(@PathVariable("id") Long order, @Valid @RequestBody OrderRequest request) {
-//        orderService.updateOrder(order, request.getCart());
+        orderService.createOrder(userEntity, request.getCart());
     }
 
 
@@ -78,8 +69,8 @@ public class OrderController {
     // ==============================================
     @DeleteMapping("/admin/{id}/delete/")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteOrder(@PathVariable("id") Long product) {
-//        productService.deleteProduct(product);
+    public void deleteOrder(@PathVariable("id") Long order) {
+        orderService.deleteOrder(order);
     }
 
 
