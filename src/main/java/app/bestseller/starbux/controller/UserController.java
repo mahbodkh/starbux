@@ -38,9 +38,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 @RequestMapping(path = "/v1/user", produces = "application/json")
 public class UserController {
-    private final UserService userService;
-
-    // ==============================================
+        // ==============================================
     //                     CLIENT
     // ==============================================
     @GetMapping("/{id}/")
@@ -65,7 +63,7 @@ public class UserController {
     // ==============================================
     @PostMapping("/admin/create/")
     @ResponseStatus(HttpStatus.CREATED)
-    public void createUserByAdmin(@Valid @RequestBody CreateRequest request) {
+    public void createUserByAdmin(@Valid @RequestBody UserController.UserRequest request) {
         userService.createUser(request.getUsername(),
             request.getAuthorities().stream().map(UserEntity.Authority::valueOf).collect(Collectors.toSet()),
             request.getEmail(),
@@ -95,7 +93,7 @@ public class UserController {
 
     @PutMapping("/admin/{id}/edit/")
     @ResponseStatus(HttpStatus.OK)
-    public void editUser(@PathVariable("id") Long user, @Valid @RequestBody CreateRequest request) {
+    public void editUser(@PathVariable("id") Long user, @Valid @RequestBody UserController.UserRequest request) {
         userService.editUser(
             user,
             request.getUsername(),
@@ -151,7 +149,7 @@ public class UserController {
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @Getter
-    public static class CreateRequest {
+    public static class UserRequest {
         private String username;
         private String name;
         private String family;
@@ -159,4 +157,6 @@ public class UserController {
         private String status;
         private Set<String> authorities;
     }
+
+    private final UserService userService;
 }

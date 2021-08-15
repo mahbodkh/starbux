@@ -2,7 +2,6 @@ package app.bestseller.starbux.controller;
 
 import app.bestseller.starbux.domain.UserEntity;
 import app.bestseller.starbux.repository.UserRepository;
-import app.bestseller.starbux.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -79,7 +78,7 @@ public class UserControllerTest {
     @Test
     @Transactional
     void testCreateUser_whenValidInput_thenReturns201() throws Exception {
-        var createRequest = new UserController.CreateRequest();
+        var createRequest = new UserController.UserRequest();
         ReflectionTestUtils.setField(createRequest, "username", "username");
         ReflectionTestUtils.setField(createRequest, "name", "name");
         ReflectionTestUtils.setField(createRequest, "family", "family");
@@ -145,7 +144,7 @@ public class UserControllerTest {
     void testPutEditUser_whenValidInput_thenReturns() throws Exception {
         var save = userRepository.save(buildUserEntityFirst());
 
-        var editRequest = new UserController.CreateRequest();
+        var editRequest = new UserController.UserRequest();
         ReflectionTestUtils.setField(editRequest, "username", "username");
         ReflectionTestUtils.setField(editRequest, "name", "name");
         ReflectionTestUtils.setField(editRequest, "family", "family");

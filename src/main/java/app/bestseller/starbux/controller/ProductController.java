@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 /**
@@ -48,15 +49,13 @@ public class ProductController {
                 reply.getDescription(),
                 reply.getPrice().doubleValue(),
                 reply.getStatus().name(),
+                reply.getType().name(),
                 reply.getCreated(),
                 reply.getChanged())
         );
     }
 
-    // ==============================================
-    //                     ADMIN
-    // ==============================================
-    @GetMapping("/admin/all/")
+    @GetMapping("/all/")
     public ResponseEntity<Page<ProductReply>> loadAllProducts(@RequestParam(value = "page", defaultValue = "0") int page,
                                                               @RequestParam(value = "size", defaultValue = "20") int size
     ) throws BadRequestException {
@@ -67,14 +66,18 @@ public class ProductController {
                 product.getDescription(),
                 product.getPrice().doubleValue(),
                 product.getStatus().name(),
+                product.getType().name(),
                 product.getCreated(),
                 product.getChanged()
             ));
         return ResponseEntity.ok(reply);
     }
 
+    // ==============================================
+    //                     ADMIN
+    // ==============================================
     @PostMapping("/admin/create/")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     public void createProduct(@Valid @RequestBody ProductRequest request) throws BadRequestException {
         productService.createProduct(
             request.getName(),
@@ -115,15 +118,17 @@ public class ProductController {
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @AllArgsConstructor
+    @Getter
     public static class ProductReply {
         private Long id;
         private String name;
         private String description;
         private Double price;
         private String status;
+        private String type;
         private Date created;
         private Date changed;
     }
 
-    private ProductService productService;
+    private final ProductService productService;
 }
