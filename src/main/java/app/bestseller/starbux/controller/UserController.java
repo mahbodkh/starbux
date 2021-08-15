@@ -25,13 +25,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,26 +44,27 @@ public class UserController {
     // ==============================================
     @GetMapping("/{id}/")
     public ResponseEntity<UserReply> getUser(@PathVariable("id") Long user) {
-        return ResponseEntity.of(userService.loadUser(user)
-            .map(reply ->
-                new UserReply(reply.getId(),
-                    reply.getUsername(),
-                    reply.getName(),
-                    reply.getFamily(),
-                    reply.getEmail(),
-                    reply.getCreated(),
-                    reply.getChanged(),
-                    reply.getStatus().name(),
-                    reply.getAuthorities().stream().map(Enum::name).collect(Collectors.toSet()))
-            ));
+        var reply = userService.loadUser(user);
+        return ResponseEntity.ok(
+            new UserReply(
+                reply.getId(),
+                reply.getUsername(),
+                reply.getName(),
+                reply.getFamily(),
+                reply.getEmail(),
+                reply.getCreated(),
+                reply.getChanged(),
+                reply.getStatus().name(),
+                reply.getAuthorities().stream().map(Enum::name).collect(Collectors.toSet()))
+        );
     }
 
     // ==============================================
     //                     ADMIN
     // ==============================================
     @PostMapping("/admin/create/")
-    @ResponseStatus(HttpStatus.OK)
-    public void createUserByAdmin(@Valid @RequestBody CreateRequest request) throws BadRequestException {
+    @ResponseStatus(HttpStatus.CREATED)
+    public void createUserByAdmin(@Valid @RequestBody CreateRequest request) {
         userService.createUser(request.getUsername(),
             request.getAuthorities().stream().map(UserEntity.Authority::valueOf).collect(Collectors.toSet()),
             request.getEmail(),
@@ -138,30 +133,8 @@ public class UserController {
 
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
-    @Getter
-    public static class RegisterRequest {
-        @NotNull
-        @Size(min = 5, max = 50, message = "username must be lower that 50 character.")
-        @NotBlank
-        private String username;
-        @NotNull
-        @Size(max = 50, message = "name must be lower that 50 character.")
-        @NotBlank
-        private String name;
-        @NotNull
-        @Size(max = 50, message = "family must be lower that 50 character.")
-        @NotBlank
-        private String family;
-        @NotNull
-        @Size(max = 50, message = "email must be lower that 50 character.")
-        @Email
-        private String email;
-        @Pattern(regexp = "^[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}$")
-        private String ipAddress;
-    }
-
-    @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @AllArgsConstructor
+    @Getter
     public static class UserReply {
         private Long id;
         private String username;

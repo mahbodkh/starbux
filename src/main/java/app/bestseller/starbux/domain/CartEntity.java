@@ -5,8 +5,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.annotations.Where;
-import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -38,7 +36,7 @@ import java.util.Set;
 public class CartEntity implements Comparable<CartEntity> {
 
     @Override
-    public int compareTo(@NotNull CartEntity o) {
+    public int compareTo(CartEntity o) {
         return getCreated().compareTo(o.getCreated());
     }
 

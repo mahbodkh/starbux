@@ -92,6 +92,7 @@ public class OrderController {
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @AllArgsConstructor
+    @Getter
     public static class OrderReply {
         private Long id;
         private Long user;
@@ -106,5 +107,4 @@ public class OrderController {
 
     private final OrderService orderService;
     private final UserService userService;
-    private final DiscountService discountService;
 }

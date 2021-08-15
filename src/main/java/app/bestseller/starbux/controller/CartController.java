@@ -112,6 +112,7 @@ public class CartController {
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @AllArgsConstructor
+    @Getter
     public static class CartReply {
         private Long id;
         private Long user;
@@ -123,6 +124,7 @@ public class CartController {
 
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @AllArgsConstructor
+    @Getter
     public static class OrderProductReply {
         private Long product;
         private Integer quantity;

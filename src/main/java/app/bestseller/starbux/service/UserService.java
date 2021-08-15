@@ -17,7 +17,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -94,8 +93,11 @@ public class UserService {
 
     @Cacheable(key = "'userById/' + #user.toString()")
     @Transactional(readOnly = true)
-    public Optional<UserEntity> loadUser(Long user) {
-        return getOptionalUserEntity(user);
+    public UserEntity loadUser(Long user) {
+        return Optional.of(getOptionalUserEntity(user))
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .orElseThrow(() -> new NotFoundException("User (" + user + ") not found."));
     }
 
     @Cacheable(key = "'userByUsername/' + #username")

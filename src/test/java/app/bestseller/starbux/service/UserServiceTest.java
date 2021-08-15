@@ -130,7 +130,7 @@ public class UserServiceTest {
 
         userService.frozenUser(save.getId());
 
-        var userFrozen = userService.loadUser(save.getId()).get();
+        var userFrozen = userService.loadUser(save.getId());
         assertEquals(userFrozen.getStatus(), UserEntity.Status.FROZEN);
     }
 
@@ -142,7 +142,7 @@ public class UserServiceTest {
 
         userService.banUser(save.getId());
 
-        var userBan = userService.loadUser(save.getId()).get();
+        var userBan = userService.loadUser(save.getId());
         assertEquals(userBan.getStatus(), UserEntity.Status.BANNED);
     }
 
