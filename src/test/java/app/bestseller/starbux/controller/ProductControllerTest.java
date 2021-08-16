@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -41,12 +42,17 @@ public class ProductControllerTest {
 
     private @Autowired
     ProductRepository productRepository;
+    private @Autowired
+    CacheManager cacheManager;
 
     @BeforeEach
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext)
             .alwaysDo(print())
             .build();
+
+        productRepository.deleteAll();
+        cacheManager.getCacheNames().parallelStream().forEach(name -> cacheManager.getCache(name).clear());
     }
 
 

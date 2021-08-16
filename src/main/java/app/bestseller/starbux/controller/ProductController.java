@@ -117,7 +117,6 @@ public class ProductController {
         @NotBlank
         private String name;
         @Size(min = 5, max = 100, message = "description must be lower that 100 character.")
-        @NotBlank
         private String description;
         @Digits(integer = 18, fraction = 18)
         private Double price;

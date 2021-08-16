@@ -3,9 +3,11 @@ package app.bestseller.starbux.service;
 import app.bestseller.starbux.domain.UserEntity;
 import app.bestseller.starbux.exception.BadRequestException;
 import app.bestseller.starbux.repository.UserRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -24,6 +26,14 @@ public class UserServiceTest {
     UserService userService;
     private @Autowired
     UserRepository userRepository;
+    private @Autowired
+    CacheManager cacheManager;
+
+    @BeforeEach
+    public void setUp() {
+        userRepository.deleteAll();
+        cacheManager.getCacheNames().parallelStream().forEach(name -> cacheManager.getCache(name).clear());
+    }
 
 
     @Test

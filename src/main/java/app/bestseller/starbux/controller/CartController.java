@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by Ebrahim Kh.
@@ -52,17 +54,18 @@ public class CartController {
         var reply = cartService.loadCart(cart);
         if (ObjectUtils.isEmpty(cart))
             throw new NotFoundException("Your cart not found.");
-        var cartProductItemReplies = new ArrayList<CartProductItemReply>();
-        reply.getProductItems().forEach(p ->
-            cartProductItemReplies.add(new CartProductItemReply(
-                p.getProduct(),
-                p.getQuantity(),
-                p.getPrice().doubleValue(),
-                p.getType().name())));
+        var cartItemsReply =
+            reply.getProductItems().stream().map(p ->
+                new CartProductItemReply(
+                    p.getProduct(),
+                    p.getQuantity(),
+                    p.getPrice().doubleValue(),
+                    p.getType().name()))
+                .collect(Collectors.toCollection(ArrayList::new));
         return ResponseEntity.ok(
             new CartReply(reply.getId(),
                 reply.getUser(),
-                cartProductItemReplies,
+                cartItemsReply,
                 reply.getStatus().name(),
                 reply.getCreated(),
                 reply.getChanged()
@@ -75,17 +78,18 @@ public class CartController {
     @GetMapping("/admin/{id}/user/")
     public ResponseEntity<CartReply> getCart(@PathVariable("id") Long user) {
         var reply = cartService.loadCartsByUser(user);
-        var cartProductItemReplies = new ArrayList<CartProductItemReply>();
-        reply.getProductItems().forEach(p ->
-            cartProductItemReplies.add(new CartProductItemReply(
+        var cartItemsReply = reply.getProductItems()
+            .stream()
+            .map(p -> new CartProductItemReply(
                 p.getProduct(),
                 p.getQuantity(),
                 p.getPrice().doubleValue(),
-                p.getType().name())));
+                p.getType().name()))
+            .collect(Collectors.toCollection(ArrayList::new));
         return ResponseEntity.ok(
             new CartReply(reply.getId(),
                 reply.getUser(),
-                cartProductItemReplies,
+                cartItemsReply,
                 reply.getStatus().name(),
                 reply.getCreated(),
                 reply.getChanged()
@@ -102,7 +106,9 @@ public class CartController {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @Getter
     public static class CartRequest {
+        @NotNull
         private Long product;
+        @NotNull
         private Integer quantity;
     }
 

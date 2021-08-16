@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -40,12 +41,17 @@ public class UserControllerTest {
 
     private @Autowired
     UserRepository userRepository;
+    private @Autowired
+    CacheManager cacheManager;
 
     @BeforeEach
     public void setUp() {
         this.mockMvc = webAppContextSetup(webApplicationContext)
             .alwaysDo(print())
             .build();
+
+        userRepository.deleteAll();
+        cacheManager.getCacheNames().parallelStream().forEach(name -> cacheManager.getCache(name).clear());
     }
 
     @Test

@@ -56,6 +56,10 @@ public class CartControllerTest {
             .alwaysDo(print())
             .build();
 
+        userRepository.deleteAll();
+        productRepository.deleteAll();
+        cartRepository.deleteAll();
+
         userFirst = userRepository.save(buildUserEntityFirst());
         productFirst = productRepository.save(buildProductEntityFirst());
         productSecond = productRepository.save(buildProductEntitySecond());
@@ -104,18 +108,18 @@ public class CartControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.created").isNotEmpty())
             .andExpect(MockMvcResultMatchers.jsonPath("$.changed").isNotEmpty())
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(save.getStatus().name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isArray())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems").isArray())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems").isNotEmpty())
 
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]product").value(entityFirst.getProduct()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]quantity").value(entityFirst.getQuantity()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]price").value(entityFirst.getPrice().doubleValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]type").value(entityFirst.getType().name()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]product").value(productFirst.getId()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]quantity").value(entityFirst.getQuantity()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]price").value(entityFirst.getPrice().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]type").value(entityFirst.getType().name()))
 
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]product").value(entitySecond.getProduct()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]quantity").value(entitySecond.getQuantity()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]price").value(entitySecond.getPrice().doubleValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[1]type").value(entitySecond.getType().name()));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[1]product").value(productSecond.getId()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[1]quantity").value(entitySecond.getQuantity()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[1]price").value(entitySecond.getPrice().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[1]type").value(entitySecond.getType().name()));
     }
 
     @Test
@@ -139,13 +143,13 @@ public class CartControllerTest {
             .andExpect(MockMvcResultMatchers.jsonPath("$.created").isNotEmpty())
             .andExpect(MockMvcResultMatchers.jsonPath("$.changed").isNotEmpty())
             .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(save.getStatus().name()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isArray())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts").isNotEmpty())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems").isArray())
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems").isNotEmpty())
 
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]product").value(entityFirst.getProduct()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]quantity").value(entityFirst.getQuantity()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]price").value(entityFirst.getPrice().doubleValue()))
-            .andExpect(MockMvcResultMatchers.jsonPath("$.orderProducts.[0]type").value(entityFirst.getType().name()));
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]product").value(entityFirst.getProduct()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]quantity").value(entityFirst.getQuantity()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]price").value(entityFirst.getPrice().doubleValue()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.productItems.[0]type").value(entityFirst.getType().name()));
     }
 
     @Test

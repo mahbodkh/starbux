@@ -2,9 +2,11 @@ package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.domain.ProductEntity;
 import app.bestseller.starbux.repository.ProductRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +25,14 @@ public class ProductServiceTest {
     ProductService productService;
     private @Autowired
     ProductRepository productRepository;
+    private @Autowired
+    CacheManager cacheManager;
 
+    @BeforeEach
+    public void setUp() {
+        productRepository.deleteAll();
+        cacheManager.getCacheNames().parallelStream().forEach(name -> cacheManager.getCache(name).clear());
+    }
 
     @Test
     @Transactional

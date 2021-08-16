@@ -154,23 +154,19 @@ public class UserController {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @Getter
     public static class UserRequest {
-        @NotNull
-        @Size(min = 5, max = 50, message = "username must be lower that 50 character.")
         @NotBlank
+        @Size(min = 5, max = 50, message = "username must be lower that 50 character.")
         private String username;
         @Size(max = 50, message = "name must be lower that 50 character.")
-        @NotBlank
         private String name;
         @Size(max = 50, message = "family must be lower that 50 character.")
-        @NotBlank
         private String family;
         @Size(max = 50, message = "email must be lower that 50 character.")
         @Email
         private String email;
         @Size(max = 50, message = "email must be lower that 50 character.")
         private String status;
-        @NotBlank
-        @Size(min = 5, max = 50, message = "authorities must be lower that 50 character.")
+        @Size(max = 50, message = "authorities must be lower that 50 character.")
         private Set<String> authorities;
     }
 
