@@ -42,17 +42,17 @@ public class ReportServiceTest {
     @BeforeEach
     public void setup() {
 //        user = userRepository.save(buildUserEntity());
-        productFirst = productRepository.save(buildProductEntityFirst());
-        productSecond = productRepository.save(buildProductEntitySecond());
-        cart = cartRepository.save(buildCartEntity());
-        discount = discountService.applyPromotion(cart);
-        order = orderRepository.save(buildOrderEntity());
+//        productFirst = productRepository.save(buildProductEntityFirst());
+//        productSecond = productRepository.save(buildProductEntitySecond());
+//        cart = cartRepository.save(buildCartEntity());
+//        discount = discountService.applyPromotion(cart);
+//        order = orderRepository.save(buildOrderEntity());
     }
 
 
     @Test
     public void testLoadTransaction() throws Exception {
-        var productEntity = reportService.loadTopSideProduct();
+//        var productEntity = reportService.loadTopSideProduct();
     }
 
 
@@ -70,7 +70,7 @@ public class ReportServiceTest {
     private CartEntity buildCartEntity() {
         var cart = new CartEntity();
         cart.setStatus(CartEntity.Status.OPEN);
-        cart.setUser(user.getId());
+//        cart.setUser(user.getId());
         cart.setProductItems(buildProductDetailEntity());
         return cart;
     }

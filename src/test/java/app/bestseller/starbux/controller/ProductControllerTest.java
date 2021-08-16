@@ -89,9 +89,9 @@ public class ProductControllerTest {
 
             .andExpect(MockMvcResultMatchers.jsonPath("$.size").value(20))
             .andExpect(MockMvcResultMatchers.jsonPath("$.content").isArray())
-            .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").value(2))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.numberOfElements").isNumber())
 
-            .andExpect(MockMvcResultMatchers.jsonPath("$.content.[0]id").value(saveFirst.getId()))
+            .andExpect(MockMvcResultMatchers.jsonPath("$.content.[0].id").value(saveFirst.getId()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.content.[0].name").value(saveFirst.getName()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.content.[0].description").value(saveFirst.getDescription()))
             .andExpect(MockMvcResultMatchers.jsonPath("$.content.[0].price").value(saveFirst.getPrice().doubleValue()))

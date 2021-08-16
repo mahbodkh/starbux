@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -41,7 +42,7 @@ public class ProductService {
     @Transactional(readOnly = true)
     @Cacheable(key = "'productById/' + #product.toString()")
     public ProductEntity loadProduct(Long product) {
-        return Optional.of(productRepository.findById(product))
+        return Optional.of(productRepository.findByIdAndStatus(product, ProductEntity.Status.AVAILABLE))
             .filter(Optional::isPresent)
             .map(Optional::get)
             .orElseThrow(() -> new NotFoundException("The product (" + product + ") not found."));
@@ -50,7 +51,7 @@ public class ProductService {
 
     @Transactional(readOnly = true)
     public Page<ProductEntity> loadProducts(Pageable pageable) {
-        return productRepository.findAll(pageable);
+        return productRepository.findAllByStatusIn(List.of(ProductEntity.Status.AVAILABLE), pageable);
     }
 
     @Caching(evict = {
