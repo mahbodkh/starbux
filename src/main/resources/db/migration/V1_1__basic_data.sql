@@ -1,7 +1,3 @@
--- INSERT INTO "best_users" (id, changed, created, email, family, name, status, username)
--- VALUES (1, SYSDATE, SYSDATE, 'admin@email.com', 'admin_family', 'name_family', 'ACTIVE', 'admin_username');
--- INSERT INTO "best_authorities" (user_id, authority)
--- values (1, 'ADMIN');
 
 
 
