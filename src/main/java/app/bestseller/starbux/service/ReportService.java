@@ -1,15 +1,17 @@
 package app.bestseller.starbux.service;
 
-import app.bestseller.starbux.repository.OrderRepository;
 import app.bestseller.starbux.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Tuple;
+import java.util.List;
 
 
 /**
@@ -28,8 +30,9 @@ public class ReportService {
         return reportRepository.findTheTopSideProduct(1);
     }
 
-    public void loadMostSideProducts() {
-
+    @Transactional(readOnly = true)
+    public Page<Tuple> loadTotalAmountPerUser(Pageable pageable) {
+        return reportRepository.totalAmountPerUser(pageable);
     }
 
     private final ReportRepository reportRepository;

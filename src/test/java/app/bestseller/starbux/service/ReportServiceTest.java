@@ -12,11 +12,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.util.Collections;
+import java.math.RoundingMode;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -45,17 +46,25 @@ public class ReportServiceTest {
     @BeforeEach
     public void setup() {
         user = userRepository.save(buildUserEntity());
-
         productFirst = productRepository.save(buildProductEntityFirst());
         productSecond = productRepository.save(buildProductEntitySecond());
         productThird = productRepository.save(buildProductEntityThird());
 
-        cart = cartService.createOrUpdateCart(user, productFirst.getId(), 4);
-        cart = cartService.createOrUpdateCart(user, productSecond.getId(), 5);
-        cart = cartService.createOrUpdateCart(user, productThird.getId(), 2);
+        // cart + discount + order -- > First
+        cartFirst = cartService.createOrUpdateCart(user, productFirst.getId(), 4);
+        cartFirst = cartService.createOrUpdateCart(user, productSecond.getId(), 5);
+        cartFirst = cartService.createOrUpdateCart(user, productThird.getId(), 2);
+        cartFirst.setStatus(CartEntity.Status.DONE);
+        cartFirst = cartRepository.save(cartFirst);
+        discountFirst = discountService.applyPromotion(cartFirst);
+        orderFirst = orderRepository.save(buildOrderEntityFirst());
 
-        discount = discountService.applyPromotion(cart);
-        order = orderRepository.save(buildOrderEntity());
+        // cart + discount + order -- > Second
+        cartSecond = cartService.createOrUpdateCart(user, productFirst.getId(), 3);
+        cartSecond.setStatus(CartEntity.Status.DONE);
+        cartSecond = cartRepository.save(cartSecond);
+        discountSecond = discountService.applyPromotion(cartSecond);
+        orderSecond = orderRepository.save(buildOrderEntitySecond());
     }
 
 
@@ -66,18 +75,42 @@ public class ReportServiceTest {
 
         assertEquals(productSecond.getId(), ((BigInteger) product.get("productId")).longValue());
         assertEquals(5, ((BigInteger) product.get("productCount")).intValue());
-        assertEquals(productSecond.getType(), ProductEntity.Type.valueOf(product.get("productType", String.class)));
+    }
+
+    @Test
+    @Transactional
+    public void testReport_totalAmountPerUser() throws Exception {
+        var totalAmountAndUsers = reportService.loadTotalAmountPerUser(Pageable.ofSize(20));
+
+        var tupleUsers = totalAmountAndUsers.getContent();
+
+        assertEquals(user.getId(), tupleUsers.get(0).get("user", Long.class));
+        assertEquals(cartFirst.calculateTotal().add(cartSecond.calculateTotal())
+                .setScale(2, RoundingMode.HALF_UP),
+            tupleUsers.get(0).get("total", BigDecimal.class)
+                .setScale(2, RoundingMode.HALF_UP));
     }
 
 
-    private OrderEntity buildOrderEntity() {
+    private OrderEntity buildOrderEntityFirst() {
         var order = new OrderEntity();
         order.setStatus(OrderEntity.Status.DONE);
         order.setUser(user.getId());
-        order.setCart(cart.getId());
-        order.setTotal(cart.calculateTotal());
-        order.setPrice(order.getTotal().subtract(discount.getRate()));
-        order.setDiscount(discount.getRate());
+        order.setCart(cartFirst.getId());
+        order.setTotal(cartFirst.calculateTotal());
+        order.setPrice(order.getTotal().subtract(discountFirst.getRate()));
+        order.setDiscount(discountFirst.getRate());
+        return order;
+    }
+
+    private OrderEntity buildOrderEntitySecond() {
+        var order = new OrderEntity();
+        order.setStatus(OrderEntity.Status.DONE);
+        order.setUser(user.getId());
+        order.setCart(cartSecond.getId());
+        order.setTotal(cartSecond.calculateTotal());
+        order.setPrice(order.getTotal().subtract(discountSecond.getRate()));
+        order.setDiscount(discountSecond.getRate());
         return order;
     }
 
@@ -105,8 +138,8 @@ public class ReportServiceTest {
         var product = new ProductEntity();
         product.setType(ProductEntity.Type.SIDE);
         product.setPrice(BigDecimal.valueOf(2));
-        product.setName("product_second_name");
-        product.setDescription("product_second_description");
+        product.setName("product_third_name");
+        product.setDescription("product_third_description");
         product.setStatus(ProductEntity.Status.AVAILABLE);
         return product;
     }
@@ -126,7 +159,10 @@ public class ReportServiceTest {
     private ProductEntity productFirst;
     private ProductEntity productSecond;
     private ProductEntity productThird;
-    private CartEntity cart;
-    private DiscountService.DiscountEntity discount;
-    private OrderEntity order;
+    private CartEntity cartFirst;
+    private CartEntity cartSecond;
+    private DiscountService.DiscountEntity discountFirst;
+    private DiscountService.DiscountEntity discountSecond;
+    private OrderEntity orderFirst;
+    private OrderEntity orderSecond;
 }
