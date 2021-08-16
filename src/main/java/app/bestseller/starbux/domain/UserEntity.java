@@ -21,8 +21,8 @@ import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.Size;
-import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -36,7 +36,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class UserEntity {
-
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,7 +55,7 @@ public class UserEntity {
     private String email;
     @Convert(converter = SetAuthorityConverter.class)
     @Column(name = "authorities")
-    private Set<Authority> authorities = Collections.emptySet();
+    private Set<Authority> authorities = new HashSet<>();
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
