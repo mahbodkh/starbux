@@ -43,6 +43,7 @@ public class ReportServiceTest {
     private @Autowired
     CartService cartService;
 
+
     @BeforeEach
     public void setup() {
         user = userRepository.save(buildUserEntity());

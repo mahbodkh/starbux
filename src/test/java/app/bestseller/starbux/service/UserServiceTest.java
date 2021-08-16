@@ -20,11 +20,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UserServiceTest {
-
     private @Autowired
     UserService userService;
     private @Autowired
     UserRepository userRepository;
+
 
     @Test
     @Transactional
@@ -57,6 +57,7 @@ public class UserServiceTest {
         }
     }
 
+
     @Test
     @Transactional
     public void testLoadUser() throws Exception {
@@ -71,6 +72,7 @@ public class UserServiceTest {
         assertEquals(save.getUsername(), result.getUsername());
         assertEquals(save.getEmail(), result.getEmail());
     }
+
 
     @Test
     @Transactional
@@ -122,6 +124,7 @@ public class UserServiceTest {
         assertEquals(edit.getAuthorities(), editSave.getAuthorities());
     }
 
+
     @Test
     @Transactional
     public void testFrozenUser() throws Exception {
@@ -133,6 +136,7 @@ public class UserServiceTest {
         var userFrozen = userService.loadUser(save.getId());
         assertEquals(userFrozen.getStatus(), UserEntity.Status.FROZEN);
     }
+
 
     @Test
     @Transactional
@@ -146,6 +150,7 @@ public class UserServiceTest {
         assertEquals(userBan.getStatus(), UserEntity.Status.BANNED);
     }
 
+
     @Test
     @Transactional
     public void testSafeDeleteUser() throws Exception {
@@ -157,6 +162,7 @@ public class UserServiceTest {
         var userDelete = userRepository.getById(save.getId());
         assertEquals(userDelete.getStatus(), UserEntity.Status.DELETED);
     }
+
 
     @Test
     @Transactional

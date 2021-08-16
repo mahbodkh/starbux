@@ -42,6 +42,7 @@ public class OrderServiceTest {
     private @Autowired
     CartRepository cartRepository;
 
+
     @BeforeEach
     public void setup() {
         user = userRepository.save(buildUserEntity());
@@ -67,6 +68,7 @@ public class OrderServiceTest {
         assertEquals(cart.calculateTotal().subtract(discount.getRate()), save.getPrice());
     }
 
+
     @Test
     @Transactional
     public void testLoadOrder() throws Exception {
@@ -81,6 +83,7 @@ public class OrderServiceTest {
         assertEquals(save.getDiscount(), order.getDiscount());
         assertEquals(save.getPrice(), order.getPrice());
     }
+
 
     @Test
     @Transactional

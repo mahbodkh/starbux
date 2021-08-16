@@ -19,7 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
 public class ProductServiceTest {
-
     private @Autowired
     ProductService productService;
     private @Autowired

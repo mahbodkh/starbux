@@ -26,13 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 public class DiscountServiceTest {
-
     private @Autowired
     DiscountService discountService;
-
     private @Autowired
     UserRepository userRepository;
-
     private @Autowired
     ProductRepository productRepository;
 
