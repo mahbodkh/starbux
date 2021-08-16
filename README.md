@@ -2,18 +2,19 @@
 
 ### Features:
 
-* Springboot.
+* _Springboot_.
 * H2.
 * Caching.
-* Flyway Migration.
-* Slf4j for logs.  
-* Lombok.
-* Swagger.
-* Dockerfile.
-* Deploy Heroku 
-* All services are decoupled design [`SOLID`]
+* _Flyway_ Migration.
+* _Slf4j_ logs.  
+* _Lombok_.
+* _Swagger_.
+* Integration Api Test, Service + Unit Test.  
+* Dockerized.
+* Deploy _Heroku_ + CI.
 * All services are injected with maximum capacity beans.
-* _Ready for monitoring. [actuator, prometheus, influxDb]_
+* _Ready for monitoring. [~~actuator~~, ~~prometheus~~, ~~influxDb~~]_
+* All services are decoupled design. [`SOLID`]
 
 ### Start:
 
