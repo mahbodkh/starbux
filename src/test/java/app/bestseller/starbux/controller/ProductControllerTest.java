@@ -74,9 +74,9 @@ public class ProductControllerTest {
     @Test
     @Transactional
     void testGetAllProducts_whenValidInput_thenReturnsAndExpectResponses() throws Exception {
+        productRepository.deleteAll();
         var saveFirst = productRepository.save(buildProductEntityFirst());
-        var saveSecond
-            = productRepository.save(buildProductEntitySecond());
+        var saveSecond = productRepository.save(buildProductEntitySecond());
 
         mockMvc.perform(MockMvcRequestBuilders
             .get("/v1/product/all/")

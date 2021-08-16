@@ -25,6 +25,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Digits;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -109,10 +113,17 @@ public class ProductController {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @Getter
     public static class ProductRequest {
+        @Size(min = 5, max = 50, message = "name must be lower that 50 character.")
+        @NotBlank
         private String name;
+        @Size(min = 5, max = 100, message = "description must be lower that 100 character.")
+        @NotBlank
         private String description;
+        @Digits(integer = 18, fraction = 18)
         private Double price;
+        @Size(min = 4, max = 50, message = "status must be lower that 50 character.")
         private String status;
+        @Size(min = 4, max = 6, message = "type must be lower that 6 character.")
         private String type;
     }
 

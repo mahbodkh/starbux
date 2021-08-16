@@ -26,6 +26,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.util.Date;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -150,11 +154,23 @@ public class UserController {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @Getter
     public static class UserRequest {
+        @NotNull
+        @Size(min = 5, max = 50, message = "username must be lower that 50 character.")
+        @NotBlank
         private String username;
+        @Size(max = 50, message = "name must be lower that 50 character.")
+        @NotBlank
         private String name;
+        @Size(max = 50, message = "family must be lower that 50 character.")
+        @NotBlank
         private String family;
+        @Size(max = 50, message = "email must be lower that 50 character.")
+        @Email
         private String email;
+        @Size(max = 50, message = "email must be lower that 50 character.")
         private String status;
+        @NotBlank
+        @Size(min = 5, max = 50, message = "authorities must be lower that 50 character.")
         private Set<String> authorities;
     }
 
