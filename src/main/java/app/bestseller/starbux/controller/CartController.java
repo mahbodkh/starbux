@@ -52,9 +52,9 @@ public class CartController {
         var reply = cartService.loadCart(cart);
         if (ObjectUtils.isEmpty(cart))
             throw new NotFoundException("Your cart not found.");
-        var orderProductReplies = new ArrayList<OrderProductReply>();
+        var cartProductItemReplies = new ArrayList<CartProductItemReply>();
         reply.getProductItems().forEach(p ->
-            orderProductReplies.add(new OrderProductReply(
+            cartProductItemReplies.add(new CartProductItemReply(
                 p.getProduct(),
                 p.getQuantity(),
                 p.getPrice().doubleValue(),
@@ -62,7 +62,7 @@ public class CartController {
         return ResponseEntity.ok(
             new CartReply(reply.getId(),
                 reply.getUser(),
-                orderProductReplies,
+                cartProductItemReplies,
                 reply.getStatus().name(),
                 reply.getCreated(),
                 reply.getChanged()
@@ -75,9 +75,9 @@ public class CartController {
     @GetMapping("/admin/{id}/user/")
     public ResponseEntity<CartReply> getCart(@PathVariable("id") Long user) {
         var reply = cartService.loadCartsByUser(user);
-        var orderProductReplies = new ArrayList<OrderProductReply>();
+        var cartProductItemReplies = new ArrayList<CartProductItemReply>();
         reply.getProductItems().forEach(p ->
-            orderProductReplies.add(new OrderProductReply(
+            cartProductItemReplies.add(new CartProductItemReply(
                 p.getProduct(),
                 p.getQuantity(),
                 p.getPrice().doubleValue(),
@@ -85,7 +85,7 @@ public class CartController {
         return ResponseEntity.ok(
             new CartReply(reply.getId(),
                 reply.getUser(),
-                orderProductReplies,
+                cartProductItemReplies,
                 reply.getStatus().name(),
                 reply.getCreated(),
                 reply.getChanged()
@@ -112,7 +112,7 @@ public class CartController {
     public static class CartReply {
         private Long id;
         private Long user;
-        private List<OrderProductReply> orderProducts;
+        private List<CartProductItemReply> productItems;
         private String status;
         private Date created;
         private Date changed;
@@ -121,7 +121,7 @@ public class CartController {
     @JsonFormat(shape = JsonFormat.Shape.OBJECT)
     @AllArgsConstructor
     @Getter
-    public static class OrderProductReply {
+    public static class CartProductItemReply {
         private Long product;
         private Integer quantity;
         private Double price;
