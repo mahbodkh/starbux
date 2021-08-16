@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+
 
 /**
  * Created by Ebrahim Kh.
@@ -37,9 +40,9 @@ public class ReportController {
         var reply = reportService.loadTopSideProduct();
         return ResponseEntity.ok(
             new ReportTopSideProductReply(
-                reply.get("productId", Long.class),
-                reply.get("productCount", Integer.class)
-            ));
+                ((BigInteger) reply.get("productId")).longValue(),
+                ((BigInteger) reply.get("productCount")).intValue())
+        );
     }
 
     @GetMapping("/admin/user/amount/")
@@ -51,7 +54,7 @@ public class ReportController {
         var reply = users.map(tuple ->
             new ReportUsersTotalAmountReply(
                 tuple.get("user", Long.class),
-                tuple.get("total", Double.class)
+                tuple.get("total", BigDecimal.class).doubleValue()
             ));
         return ResponseEntity.ok(reply);
     }
