@@ -38,7 +38,7 @@ public class OrderEntity {
     @Column
     private BigDecimal total = BigDecimal.ZERO;
     @Column
-    private BigDecimal discount = total.subtract(price);
+    private BigDecimal discount = BigDecimal.ZERO;
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status;
