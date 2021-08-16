@@ -30,8 +30,6 @@ public class ReportServiceTest {
     private @Autowired
     ReportService reportService;
     private @Autowired
-    OrderService orderService;
-    private @Autowired
     OrderRepository orderRepository;
     private @Autowired
     DiscountService discountService;
@@ -115,7 +113,7 @@ public class ReportServiceTest {
 
     private UserEntity buildUserEntity() {
         var user = new UserEntity();
-        user.setUsername("username13");
+        user.setUsername("username");
         user.setName("first_name");
         user.setFamily("last_family");
         user.setAuthorities(Set.of(UserEntity.Authority.USER));
