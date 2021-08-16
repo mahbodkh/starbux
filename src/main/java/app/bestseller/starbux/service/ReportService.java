@@ -1,12 +1,13 @@
 package app.bestseller.starbux.service;
 
 import app.bestseller.starbux.repository.OrderRepository;
-import app.bestseller.starbux.repository.ProductRepository;
+import app.bestseller.starbux.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.Tuple;
 
@@ -22,15 +23,14 @@ import javax.persistence.Tuple;
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ReportService {
 
+    @Transactional(readOnly = true)
     public Tuple loadTopSideProduct() {
-        return productRepository.findTheTopSideProduct();
+        return reportRepository.findTheTopSideProduct(1);
     }
 
     public void loadMostSideProducts() {
 
     }
 
-
-    private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
+    private final ReportRepository reportRepository;
 }

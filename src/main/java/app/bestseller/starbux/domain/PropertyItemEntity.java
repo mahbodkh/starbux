@@ -6,9 +6,14 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.math.BigDecimal;
@@ -31,6 +36,7 @@ public class PropertyItemEntity {
     @Column(name = "product_id")
     private Long product;
     @Column(name = "product_type")
+    @Enumerated(EnumType.STRING)
     private ProductEntity.Type type;
     @Column
     private Integer quantity = 1;
@@ -38,8 +44,9 @@ public class PropertyItemEntity {
     private BigDecimal price = BigDecimal.ZERO;
     @Column(name = "total")
     private BigDecimal total = BigDecimal.ZERO;
-    @Column(name = "cart_id")
-    private Long cart;
+    @JoinColumn(name = "cart_id")
+    @ManyToOne(targetEntity = CartEntity.class, fetch = FetchType.EAGER)
+    private CartEntity cart;
 
 
     public BigDecimal getTotal() {
@@ -62,7 +69,7 @@ public class PropertyItemEntity {
     }
 
     @Builder(toBuilder = true)
-    public PropertyItemEntity(Long id, Long product, ProductEntity.Type type, Integer quantity, BigDecimal price, BigDecimal total, Long cart) {
+    public PropertyItemEntity(Long id, Long product, ProductEntity.Type type, Integer quantity, BigDecimal price, BigDecimal total, CartEntity cart) {
         setId(id);
         setProduct(product);
         setType(type);
@@ -74,7 +81,7 @@ public class PropertyItemEntity {
     }
 
     @Transient
-    public static PropertyItemEntity getBasicProperty(Long product, Integer quantity, BigDecimal price, ProductEntity.Type type, Long cart) {
+    public static PropertyItemEntity getBasicProperty(Long product, Integer quantity, BigDecimal price, ProductEntity.Type type, CartEntity cart) {
         return PropertyItemEntity.builder()
             .product(product)
             .quantity(quantity)
