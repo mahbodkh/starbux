@@ -9,7 +9,7 @@
 * _Slf4j_ logs.  
 * _Lombok_.
 * _Swagger_.
-* Integration Api Test, Service + Unit Test.  
+* Integration Api Test, Service + Unit Test [ { **59 test** }, { **Coverage 90%** } ]  
 * Dockerized.
 * Deploy _Heroku_ + CI.
 * All services are injected with maximum capacity beans.
