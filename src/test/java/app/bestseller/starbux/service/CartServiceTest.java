@@ -47,7 +47,7 @@ public class CartServiceTest {
 
     @Test
     @Transactional
-    public void createCart() throws Exception {
+    public void testCreateCart() throws Exception {
         var quantity = 2;
         var cart = cartService.createOrUpdateCart(userFirst, productFirst.getId(), quantity);
 
