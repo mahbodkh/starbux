@@ -139,11 +139,11 @@ public class UserServiceTest {
     @Transactional
     public void testFrozenUser() throws Exception {
         var user = buildUserEntity();
-        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userRepository.save(user);
 
         userService.frozenUser(save.getId());
 
-        var userFrozen = userService.loadUser(save.getId());
+        var userFrozen = userRepository.findById(save.getId()).get();
         assertEquals(userFrozen.getStatus(), UserEntity.Status.FROZEN);
     }
 
@@ -152,11 +152,11 @@ public class UserServiceTest {
     @Transactional
     public void testBanUser() throws Exception {
         var user = buildUserEntity();
-        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userRepository.save(user);
 
         userService.banUser(save.getId());
 
-        var userBan = userService.loadUser(save.getId());
+        var userBan = userRepository.findById(save.getId()).get();
         assertEquals(userBan.getStatus(), UserEntity.Status.BANNED);
     }
 
@@ -178,7 +178,7 @@ public class UserServiceTest {
     @Transactional
     public void testDeleteUser() throws Exception {
         var user = buildUserEntity();
-        var save = userService.createUser(user.getUsername(), user.getAuthorities(), user.getEmail(), user.getName(), user.getFamily(), false);
+        var save = userRepository.save(user);
 
         userService.deleteUser(save.getId());
 
