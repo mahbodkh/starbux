@@ -23,7 +23,7 @@ The following guides illustrate how to use some features concretely:
 Run:
 `$ mvn spring-boot:run`
 
-url: `http://localhost` Port: `8008`
+url: `http://localhost` Port: `8080`
 
 Heroku: `https://bestseller-starbux-stage.herokuapp.com`
 
