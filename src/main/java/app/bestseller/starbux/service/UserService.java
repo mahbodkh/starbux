@@ -8,6 +8,7 @@ import app.bestseller.starbux.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -17,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -66,8 +68,8 @@ public class UserService {
         @CacheEvict(key = "'userByEmail/' + #email")
     })
     @Transactional
-    public Optional<UserEntity> editUser(Long user, String username, String email, String name, String family, UserEntity.Status status,
-                                         Set<UserEntity.Authority> authorities, Boolean isAdmin) {
+    public Optional<UserEntity> editUser(Long user, String username, String email, String name, String family,
+                                         UserEntity.Status status, Set<UserEntity.Authority> authorities, Boolean isAdmin) {
         return Optional.of(userRepository.findById(user))
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -128,6 +130,9 @@ public class UserService {
                 entity -> {
                     userRepository.delete(entity);
                     log.debug("Deleted User: {}", entity);
+                    clearCaches(
+                        "'userByUsername/'" + entity.getUsername(), "'userByEmail/'" + entity.getEmail()
+                    );
                 }
             );
     }
@@ -142,6 +147,9 @@ public class UserService {
                     entity.setStatus(UserEntity.Status.DELETED);
                     userRepository.save(entity);
                     log.debug("Safe deleted User: {}", entity);
+                    clearCaches(
+                        "'userByUsername/'" + entity.getUsername(), "'userByEmail/'" + entity.getEmail()
+                    );
                 }
             );
     }
@@ -156,6 +164,9 @@ public class UserService {
                     entity.setStatus(UserEntity.Status.BANNED);
                     userRepository.save(entity);
                     log.debug("Banned User: {}", entity);
+                    clearCaches(
+                        "'userByUsername/'" + entity.getUsername(), "'userByEmail/'" + entity.getEmail()
+                    );
                 }
             );
     }
@@ -170,9 +181,19 @@ public class UserService {
                     entity.setStatus(UserEntity.Status.FROZEN);
                     userRepository.save(entity);
                     log.debug("Frozen User: {}", entity);
+                    clearCaches(
+                        "'userByUsername/'" + entity.getUsername(), "'userByEmail/'" + entity.getEmail()
+                    );
                 }
             );
     }
 
+    private void clearCaches(String... values) {
+        for (var value : values) {
+            Objects.requireNonNull(cacheManager.getCache(value)).clear();
+        }
+    }
+
     private final UserRepository userRepository;
+    private final CacheManager cacheManager;
 }

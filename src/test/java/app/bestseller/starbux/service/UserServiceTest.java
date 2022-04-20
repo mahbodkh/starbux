@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.Objects;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -32,7 +33,7 @@ public class UserServiceTest {
     @BeforeEach
     public void setUp() {
         userRepository.deleteAll();
-        cacheManager.getCacheNames().parallelStream().forEach(name -> cacheManager.getCache(name).clear());
+        cacheManager.getCacheNames().parallelStream().forEach(name -> Objects.requireNonNull(cacheManager.getCache(name)).clear());
     }
 
 

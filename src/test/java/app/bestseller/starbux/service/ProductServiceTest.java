@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -31,7 +32,7 @@ public class ProductServiceTest {
     @BeforeEach
     public void setUp() {
         productRepository.deleteAll();
-        cacheManager.getCacheNames().parallelStream().forEach(name -> cacheManager.getCache(name).clear());
+        cacheManager.getCacheNames().parallelStream().forEach(name -> Objects.requireNonNull(cacheManager.getCache(name)).clear());
     }
 
     @Test
